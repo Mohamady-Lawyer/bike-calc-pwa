@@ -1,3 +1,4 @@
+(function () {
 const inputIds = [
   'dailyKm', 'kmPrice', 'tripKm',
   'fuelRate', 'fuel92Price', 'serviceFee',
@@ -359,3 +360,4 @@ function initSplitColumns() {
 }
 
 initSplitColumns();
+})();
