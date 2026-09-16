@@ -1,6 +1,6 @@
 {
-  "name": "حاسبات محمدي",
-  "short_name": "حاسبات محمدي",
+  "name": "Bike Calculator",
+  "short_name": "Bike Calculator",
   "description": "حاسبة أرباح الموتوسيكل وحاسبة الفائدة في تطبيق واحد",
   "start_url": "./index.html",
   "scope": "./",
