@@ -360,4 +360,58 @@ function initSplitColumns() {
 }
 
 initSplitColumns();
+
+// ===== Export / Import data as a text code =====
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+const importText = document.getElementById('importText');
+const exportImportStatus = document.getElementById('exportImportStatus');
+
+function showStatus(msg, isError) {
+  exportImportStatus.textContent = msg;
+  exportImportStatus.style.color = isError ? 'var(--danger)' : 'var(--success-text)';
+  setTimeout(() => { exportImportStatus.textContent = ''; }, 3500);
+}
+
+exportBtn.addEventListener('click', () => {
+  const payload = { capitalItems, expenseItems };
+  const code = 'MOTOCALC1:' + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code)
+      .then(() => showStatus('تم نسخ الكود! الصقه في الجهاز التاني'))
+      .catch(() => {
+        importText.value = code;
+        showStatus('انسخ الكود يدويًا من الصندوق تحت');
+      });
+  } else {
+    importText.value = code;
+    showStatus('انسخ الكود يدويًا من الصندوق تحت');
+  }
+});
+
+importBtn.addEventListener('click', () => {
+  const raw = importText.value.trim();
+  if (!raw.startsWith('MOTOCALC1:')) {
+    showStatus('الكود غير صحيح أو غير مكتمل', true);
+    return;
+  }
+  try {
+    const json = decodeURIComponent(escape(atob(raw.slice('MOTOCALC1:'.length))));
+    const payload = JSON.parse(json);
+    if (!Array.isArray(payload.capitalItems) || !Array.isArray(payload.expenseItems)) {
+      throw new Error('invalid shape');
+    }
+    capitalItems = payload.capitalItems;
+    expenseItems = payload.expenseItems;
+    renderSplitColumn(capitalItems, capitalItemsEl, capitalBtnRow, 'capital');
+    renderSplitColumn(expenseItems, expenseItemsEl, expenseBtnRow, 'expense');
+    updateSplitTotals();
+    saveCapitalExpenses();
+    importText.value = '';
+    showStatus('تم استيراد البيانات بنجاح');
+  } catch (e) {
+    showStatus('تعذّر قراءة الكود، تأكد إنه منسوخ كامل', true);
+  }
+});
 })();
