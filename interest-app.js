@@ -1,3 +1,4 @@
+(function () {
 const amountInput = document.getElementById("amountInput");
 const rateInput = document.getElementById("rateInput");
 const durationInput = document.getElementById("durationInput");
@@ -152,3 +153,4 @@ function getTabOrder() {
 });
 
 init();
+})();
