@@ -14,7 +14,6 @@ const mainView = document.getElementById('mainView');
 const settingsView = document.getElementById('settingsView');
 const capitalView = document.getElementById('capitalView');
 const pageTitle = document.getElementById('pageTitle');
-const calcBtn = document.getElementById('calcBtn');
 const tabCalc = document.getElementById('tabCalc');
 const tabCapital = document.getElementById('tabCapital');
 
@@ -121,7 +120,6 @@ function calculate() {
   document.getElementById('bdCompany').textContent = round2(companyCommission).toLocaleString('en-US');
 }
 
-calcBtn.addEventListener('click', calculate);
 
 // Enter key navigation between fields, last field triggers calculate/back
 function setupEnterNavigation() {
