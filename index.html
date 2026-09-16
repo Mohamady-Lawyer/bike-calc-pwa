@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>حاسبات محمدي</title>
+<meta name="theme-color" content="#0d1117">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon128.png">
+<link rel="apple-touch-icon" href="icons/icon128.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="dark">
+
+  <div class="app-tabs">
+    <button id="appTabMoto" class="app-tab-btn active">🏍️ الموتوسيكل</button>
+    <button id="appTabInterest" class="app-tab-btn">◐ الفائدة</button>
+  </div>
+
+  <!-- ============ MOTO APP ============ -->
+  <div id="motoApp" class="view-page active">
+
+    <div class="page-header">
+      <div class="page-title">
+        <img src="icons/icon48.png" alt="logo">
+        <span id="motoPageTitle">حاسبة أرباح الموتوسيكل</span>
+      </div>
+      <div class="header-btns">
+        <button id="settingsBtn" class="icon-btn" title="الإعدادات">⚙️</button>
+        <button id="darkModeBtn" class="icon-btn" title="الوضع الليلي">☀️</button>
+      </div>
+    </div>
+
+    <div class="sub-tabs">
+      <button id="tabCalc" class="tab-btn active">الحاسبة</button>
+      <button id="tabCapital" class="tab-btn">رأس مال ومصروفات</button>
+    </div>
+
+    <!-- MAIN VIEW -->
+    <div id="mainView">
+      <div class="card">
+        <h2>المدخلات اليومية</h2>
+        <div class="row">
+          <label>الاستهلاك اليومي (كيلومتر)</label>
+          <input type="number" id="dailyKm" value="200" step="1">
+        </div>
+        <div class="row">
+          <label>المسافة اليومية المحسوب عليها ربح (كم)</label>
+          <input type="number" id="profitKm" value="180" step="1" readonly>
+        </div>
+        <div class="row">
+          <label>سعر الكيلومتر (جنيه)</label>
+          <input type="number" id="kmPrice" value="6" step="1">
+        </div>
+        <div class="row">
+          <label>متوسط المسافة لكل رحلة (كم)</label>
+          <input type="number" id="tripKm" value="10" step="1">
+        </div>
+      </div>
+
+      <button id="calcBtn" class="calc-btn">احسب</button>
+
+      <div class="results">
+        <div class="result-box">
+          <span class="result-label">عدد الرحلات المتوقعة</span>
+          <span class="result-value" id="tripCount">0</span>
+        </div>
+        <div class="result-box">
+          <span class="result-label">إجمالي الدخل اليومي</span>
+          <span class="result-value" id="dailyIncome">0</span>
+        </div>
+        <div class="result-box">
+          <span class="result-label">إجمالي المصاريف اليومية</span>
+          <span class="result-value" id="dailyExpenses">0</span>
+          <div class="breakdown">
+            <div class="breakdown-row"><span>بنزين</span><span id="bdFuel">0</span></div>
+            <div class="breakdown-row"><span>صيانة</span><span id="bdMaintenance">0</span></div>
+            <div class="breakdown-row"><span>زيت موتوسيكلات</span><span id="bdOil">0</span></div>
+            <div class="breakdown-row"><span>مصاريف أخرى</span><span id="bdOther">0</span></div>
+            <div class="breakdown-row"><span>عمولة الشركة</span><span id="bdCompany">0</span></div>
+          </div>
+        </div>
+        <div class="result-box highlight">
+          <span class="result-label">صافي الربح المتوقع</span>
+          <span class="result-value" id="dailyNetProfit">0</span>
+          <div class="breakdown">
+            <div class="breakdown-row"><span>شهر 26 يوم</span><span id="bdMonth26">0</span></div>
+            <div class="breakdown-row"><span>شهر 30 يوم</span><span id="bdMonth30">0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div id="settingsView" style="display:none;">
+      <div class="card">
+        <h2>الوقود (بنزين 92)</h2>
+        <div class="row">
+          <label>معدل الاستهلاك (لتر / 100 كم)</label>
+          <input type="number" id="fuelRate" value="3.3" step="0.1">
+        </div>
+        <div class="row">
+          <label>سعر لتر بنزين 92 (جنيه)</label>
+          <input type="number" id="fuel92Price" value="22.25" step="0.01">
+        </div>
+        <div class="row">
+          <label>رسم الخدمة على اللتر (جنيه)</label>
+          <input type="number" id="serviceFee" value="1.25" step="0.01">
+        </div>
+        <div class="row">
+          <label>إجمالي سعر اللتر (جنيه)</label>
+          <input type="number" id="fuelPrice" value="23.5" step="0.01" readonly>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>مصاريف ونسب أخرى</h2>
+        <div class="row">
+          <label>نسبة الصيانة من تكلفة الوقود</label>
+          <input type="number" id="maintenanceRatio" value="0.8" step="0.01">
+        </div>
+        <div class="row">
+          <label>نسبة زيت موتوسيكلات من تكلفة الوقود</label>
+          <input type="number" id="oilRatio" value="0" step="0.01">
+        </div>
+        <div class="row">
+          <label>نسبة مصاريف أخرى من تكلفة الوقود</label>
+          <input type="number" id="otherRatio" value="0.6" step="0.01">
+        </div>
+        <div class="row">
+          <label>نسبة عمولة الشركة (من إجمالي الدخل)</label>
+          <input type="number" id="companyRatio" value="0.15" step="0.01">
+        </div>
+      </div>
+
+      <button id="backBtn" class="calc-btn back-btn">رجوع للحاسبة</button>
+    </div>
+
+    <!-- CAPITAL & EXPENSES VIEW -->
+    <div id="capitalView" style="display:none;">
+      <div class="split-cols">
+        <div class="split-col">
+          <div class="split-title">رأس مال</div>
+          <div id="capitalItems"></div>
+          <div class="split-btn-row" id="capitalBtnRow"></div>
+          <div class="split-total capital-total">
+            <span class="split-total-label">الإجمالي</span>
+            <span class="split-total-value" id="capitalTotal">0</span>
+          </div>
+        </div>
+        <div class="split-col">
+          <div class="split-title">مصروفات</div>
+          <div id="expenseItems"></div>
+          <div class="split-btn-row" id="expenseBtnRow"></div>
+          <div class="split-total expense-total">
+            <span class="split-total-label">الإجمالي</span>
+            <span class="split-total-value" id="expenseTotal">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="deficit-card" id="deficitCard" style="display:none;">
+        <span class="split-total-label">العجز</span>
+        <span class="split-total-value" id="deficitValue">0</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ INTEREST APP ============ -->
+  <div id="interestApp" class="view-page">
+    <div class="card">
+      <div class="page-header" style="margin-bottom:14px;">
+        <div class="page-title">
+          <img src="icons/icon48.png" alt="logo" style="opacity:0;width:0;height:0;">
+          <span>حاسبة الفائدة</span>
+        </div>
+        <button id="darkToggle" class="icon-btn" aria-label="تبديل الوضع الليلي">◐</button>
+      </div>
+
+      <div class="mode-switch">
+        <button id="modeSimpleBtn" class="mode-btn active">فائدة عادية</button>
+        <button id="modeLoanBtn" class="mode-btn">فائدة قرض</button>
+      </div>
+
+      <div class="inputs">
+        <div class="input-box">
+          <div class="label" id="amountLabel">المبلغ (جنيه)</div>
+          <input type="text" inputmode="numeric" id="amountInput" value="100,000">
+        </div>
+        <div class="input-box">
+          <div class="label">الفائدة السنوية (%)</div>
+          <input type="number" id="rateInput" step="1" min="0" value="12">
+        </div>
+        <div class="input-box loan-only hidden" id="durationBox">
+          <div class="label">مدة السداد (شهور)</div>
+          <input type="number" id="durationInput" step="1" min="1" value="24">
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="result-row">
+        <span class="result-label" id="resultLabel">الفائدة الشهرية</span>
+        <span class="result-value" id="resultValue">0 جنيه</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="storage-shim.js"></script>
+  <script src="moto-app.js"></script>
+  <script src="interest-app.js"></script>
+  <script src="app-tabs.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

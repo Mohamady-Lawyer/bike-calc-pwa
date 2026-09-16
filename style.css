@@ -1,0 +1,642 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+* {
+  box-sizing: border-box;
+  font-family: "Space Grotesk", "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  padding: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+
+  /* Light mode (default) — soft pink, easy on the eyes */
+  --bg-page: #fbeef1;
+  --card-grad-1: #fdf5f7;
+  --card-grad-2: #fbeef1;
+  --card-border: #f0d9e0;
+  --top-glow: #d1618a;
+  --title-color: #4a2c37;
+  --icon-bg: #fdf5f7;
+  --icon-border: #f0d9e0;
+  --icon-color: #c14b78;
+  --switch-bg: #f6e2e8;
+  --switch-border: #f0d9e0;
+  --mode-text: #b184a0;
+  --mode-text-hover: #6d3f52;
+  --mode-active-bg: rgba(193, 75, 120, 0.14);
+  --mode-active-text: #ad2f5f;
+  --mode-active-ring: rgba(193, 75, 120, 0.35);
+  --input-bg: #fdf5f7;
+  --input-border: #f0d9e0;
+  --input-focus-border: #c14b78;
+  --input-focus-ring: rgba(193, 75, 120, 0.12);
+  --label-color: #b98fa0;
+  --input-text: #402531;
+  --divider-color: #f0d9e0;
+  --result-grad-1: rgba(193, 75, 120, 0.12);
+  --result-grad-2: rgba(193, 75, 120, 0.03);
+  --result-border: rgba(193, 75, 120, 0.32);
+  --result-label-color: #ad2f5f;
+  --result-value-color: #ad2f5f;
+  --result-value-glow: rgba(193, 75, 120, 0.18);
+
+  --accent-1: #d1618a;
+  --accent-2: #c14b78;
+  --muted: #b98fa0;
+  --danger: #c0392b;
+  --success-text: #ad2f5f;
+
+  background: var(--bg-page);
+  color: var(--input-text);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+body.dark {
+  /* Dark mode — futuristic teal/cyan look */
+  --bg-page: #05070a;
+  --card-grad-1: #0d1117;
+  --card-grad-2: #0a0d12;
+  --card-border: #1c2733;
+  --top-glow: #2dd4bf;
+  --title-color: #e6faf6;
+  --icon-bg: #0f1620;
+  --icon-border: #1c2733;
+  --icon-color: #2dd4bf;
+  --switch-bg: #0a0f16;
+  --switch-border: #1c2733;
+  --mode-text: #6b7a8a;
+  --mode-text-hover: #a8b7c5;
+  --mode-active-bg: rgba(45, 212, 191, 0.12);
+  --mode-active-text: #2dd4bf;
+  --mode-active-ring: rgba(45, 212, 191, 0.35);
+  --input-bg: #0a0f16;
+  --input-border: #1c2733;
+  --input-focus-border: #2dd4bf;
+  --input-focus-ring: rgba(45, 212, 191, 0.08);
+  --label-color: #5a6b7a;
+  --input-text: #eef4f8;
+  --divider-color: #1c2733;
+  --result-grad-1: rgba(45, 212, 191, 0.1);
+  --result-grad-2: rgba(45, 212, 191, 0.03);
+  --result-border: rgba(45, 212, 191, 0.3);
+  --result-label-color: #7fe8d8;
+  --result-value-color: #2dd4bf;
+  --result-value-glow: rgba(45, 212, 191, 0.35);
+
+  --accent-1: #2dd4bf;
+  --accent-2: #22b8a3;
+  --muted: #5a6b7a;
+  --danger: #ff6b5b;
+  --success-text: #2dd4bf;
+}
+
+/* ===== App-level tab bar (Moto / Interest) ===== */
+.app-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--switch-bg);
+  border: 1px solid var(--switch-border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+
+.app-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--mode-text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 8px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.app-tab-btn:hover {
+  color: var(--mode-text-hover);
+}
+
+.app-tab-btn.active {
+  background: var(--mode-active-bg);
+  color: var(--mode-active-text);
+  box-shadow: inset 0 0 0 1px var(--mode-active-ring);
+}
+
+.app-tab-btn img {
+  width: 16px;
+  height: 16px;
+}
+
+/* ===== Glassy card shell (shared) ===== */
+.card {
+  position: relative;
+  background: linear-gradient(180deg, var(--card-grad-1) 0%, var(--card-grad-2) 100%);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 16px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--top-glow), transparent);
+  opacity: 0.6;
+}
+
+.card h2 {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--label-color);
+  margin: 0 0 10px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.02em;
+}
+
+/* ===== Page header ===== */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.page-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--title-color);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-title img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+}
+
+.header-btns {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-btn {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--icon-border);
+  background: var(--icon-bg);
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 8px;
+  color: var(--icon-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.icon-btn:hover {
+  border-color: var(--icon-color);
+  box-shadow: 0 0 8px var(--result-border);
+}
+
+/* ===== Sub-tabs (Moto: calc/settings/capital nav) ===== */
+.sub-tabs {
+  display: flex;
+  gap: 6px;
+  background: var(--switch-bg);
+  border: 1px solid var(--switch-border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 12px;
+}
+
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--mode-text);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 6px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: var(--mode-text-hover);
+}
+
+.tab-btn.active {
+  background: var(--mode-active-bg);
+  color: var(--mode-active-text);
+  box-shadow: inset 0 0 0 1px var(--mode-active-ring);
+}
+
+/* ===== Rows / inputs (Moto calculator fields) ===== */
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 8px;
+}
+
+.row:last-child {
+  margin-bottom: 0;
+}
+
+.row label {
+  font-size: 11.5px;
+  color: var(--label-color);
+  flex: 1;
+}
+
+.row input {
+  width: 100px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  padding: 7px 6px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  direction: ltr;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.row input:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.row input[readonly] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ===== Primary action button ===== */
+.calc-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  box-shadow: 0 0 16px var(--result-border);
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+body.dark .calc-btn {
+  color: #04211d;
+}
+
+.calc-btn:hover {
+  opacity: 0.92;
+}
+
+.calc-btn:active {
+  transform: translateY(1px);
+}
+
+.back-btn {
+  background: var(--switch-bg);
+  color: var(--mode-active-text);
+  box-shadow: none;
+  border: 1px solid var(--switch-border);
+}
+
+body.dark .back-btn {
+  color: var(--mode-active-text);
+}
+
+/* ===== Results grid ===== */
+.results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.result-box {
+  background: linear-gradient(135deg, var(--result-grad-1), var(--result-grad-2));
+  border: 1px solid var(--result-border);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}
+
+.result-box.highlight {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 16px var(--result-border);
+}
+
+.result-label {
+  display: block;
+  font-size: 10.5px;
+  color: var(--result-label-color);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.result-value {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--result-value-color);
+  text-shadow: 0 0 12px var(--result-value-glow);
+}
+
+.breakdown {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--divider-color);
+  display: grid;
+  gap: 3px;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--label-color);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.breakdown-row span:last-child {
+  font-weight: 600;
+  color: var(--accent-1);
+}
+
+/* ===== Capital & Expenses split view ===== */
+.split-cols {
+  display: flex;
+  gap: 10px;
+}
+
+.split-col {
+  flex: 1;
+}
+
+.split-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--label-color);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.split-item {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  padding: 4px 6px;
+  margin-bottom: 5px;
+  cursor: grab;
+  transition: opacity 0.1s ease, border-color 0.1s ease;
+}
+
+.split-item:active {
+  cursor: grabbing;
+}
+
+.split-item.dragging {
+  opacity: 0.4;
+}
+
+.split-item.drag-over {
+  border-color: var(--accent-1);
+  border-width: 2px;
+}
+
+.split-item input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  color: inherit;
+  font-family: "JetBrains Mono", monospace;
+  outline: none;
+}
+
+.split-item .split-amount {
+  font-size: 13px;
+  padding: 2px 0;
+  border-bottom: 1px solid var(--divider-color);
+  margin-bottom: 2px;
+  direction: ltr;
+  color: var(--input-text);
+}
+
+.split-item .split-label {
+  font-size: 10px;
+  color: var(--label-color);
+  padding: 1px 0;
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.split-btn-row {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 6px;
+}
+
+.split-add-btn, .split-remove-btn {
+  flex: 1;
+  padding: 3px;
+  border-radius: 6px;
+  border: 1px dashed var(--input-border);
+  background: transparent;
+  color: var(--label-color);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.split-add-btn:hover, .split-remove-btn:hover {
+  border-color: var(--accent-1);
+  color: var(--accent-1);
+}
+
+.split-total {
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  border: 1px solid var(--card-border);
+  background: var(--card-grad-1);
+}
+
+.split-total-label {
+  display: block;
+  font-size: 9px;
+  color: var(--label-color);
+}
+
+.split-total-value {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.capital-total .split-total-value {
+  color: var(--success-text);
+}
+
+.expense-total .split-total-value {
+  color: var(--danger);
+}
+
+.deficit-card {
+  margin-top: 8px;
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  border: 1px solid var(--danger);
+  background: var(--result-grad-1);
+}
+
+.deficit-card .split-total-value {
+  color: var(--danger);
+}
+
+/* ===== Interest calculator specific ===== */
+.mode-switch {
+  display: flex;
+  gap: 6px;
+  background: var(--switch-bg);
+  border: 1px solid var(--switch-border);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+
+.mode-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--mode-text);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 6px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mode-btn:hover {
+  color: var(--mode-text-hover);
+}
+
+.mode-btn.active {
+  background: var(--mode-active-bg);
+  color: var(--mode-active-text);
+  box-shadow: inset 0 0 0 1px var(--mode-active-ring);
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-box {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  padding: 9px 12px;
+  transition: border-color 0.15s ease;
+}
+
+.input-box:focus-within {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.input-box.hidden {
+  display: none;
+}
+
+.input-box .label {
+  font-size: 10.5px;
+  color: var(--label-color);
+  margin-bottom: 5px;
+  letter-spacing: 0.02em;
+}
+
+.input-box input {
+  width: 100%;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 19px;
+  font-weight: 500;
+  text-align: center;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--input-text);
+  direction: ltr;
+  outline: none;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--divider-color), transparent);
+  margin: 14px 0;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--result-grad-1), var(--result-grad-2));
+  border: 1px solid var(--result-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.result-row .result-label {
+  margin-bottom: 0;
+  font-size: 12.5px;
+}
+
+.result-row .result-value {
+  font-size: 19px;
+}
+
+.view-page {
+  display: none;
+}
+
+.view-page.active {
+  display: block;
+}
