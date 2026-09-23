@@ -52,6 +52,7 @@ body {
   --muted: #b98fa0;
   --danger: #c0392b;
   --success-text: #ad2f5f;
+  --fixed-color: #c47a1e;
 
   background: var(--bg-page);
   color: var(--input-text);
@@ -95,6 +96,7 @@ body.dark {
   --muted: #5a6b7a;
   --danger: #ff6b5b;
   --success-text: #2dd4bf;
+  --fixed-color: #f0a83c;
 }
 
 /* ===== App-level tab bar (Moto / Interest) ===== */
@@ -219,7 +221,7 @@ body.dark {
   box-shadow: 0 0 8px var(--result-border);
 }
 
-/* ===== Sub-tabs (Moto: calc/settings/capital nav) ===== */
+/* ===== Sub-tabs (Moto: calc/settings/capital/fixed nav) ===== */
 .sub-tabs {
   display: flex;
   gap: 6px;
@@ -397,7 +399,7 @@ body.dark .back-btn {
   color: var(--accent-1);
 }
 
-/* ===== Capital & Expenses split view ===== */
+/* ===== Capital & Expenses split view (two columns) ===== */
 .split-cols {
   display: flex;
   gap: 10px;
@@ -405,6 +407,11 @@ body.dark .back-btn {
 
 .split-col {
   flex: 1;
+}
+
+/* ===== Fixed Monthly Expenses view (single full-width column) ===== */
+.split-col-full {
+  width: 100%;
 }
 
 .split-title {
@@ -514,6 +521,18 @@ body.dark .back-btn {
 
 .expense-total .split-total-value {
   color: var(--danger);
+}
+
+.fixed-total {
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  border: 1px solid var(--fixed-color);
+  background: var(--card-grad-1);
+}
+
+.fixed-total .split-total-value {
+  color: var(--fixed-color);
 }
 
 .deficit-card {

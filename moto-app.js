@@ -1,4 +1,3 @@
-(function () {
 const inputIds = [
   'dailyKm', 'kmPrice', 'tripKm',
   'fuelRate', 'fuel92Price', 'serviceFee',
@@ -14,9 +13,11 @@ const backBtn = document.getElementById('backBtn');
 const mainView = document.getElementById('mainView');
 const settingsView = document.getElementById('settingsView');
 const capitalView = document.getElementById('capitalView');
+const fixedView = document.getElementById('fixedView');
 const pageTitle = document.getElementById('pageTitle');
 const tabCalc = document.getElementById('tabCalc');
 const tabCapital = document.getElementById('tabCapital');
+const tabFixed = document.getElementById('tabFixed');
 
 function showSettings() {
   mainView.style.display = 'none';
@@ -28,6 +29,7 @@ function showSettings() {
 function showMain() {
   settingsView.style.display = 'none';
   capitalView.style.display = 'none';
+  fixedView.style.display = 'none';
   mainView.style.display = 'block';
   pageTitle.textContent = 'حاسبة أرباح الموتوسيكل';
   settingsBtn.style.display = 'inline-block';
@@ -35,23 +37,29 @@ function showMain() {
 }
 
 function showTab(tab) {
+  tabCalc.classList.remove('active');
+  tabCapital.classList.remove('active');
+  tabFixed.classList.remove('active');
+  mainView.style.display = 'none';
+  settingsView.style.display = 'none';
+  capitalView.style.display = 'none';
+  fixedView.style.display = 'none';
+
   if (tab === 'calc') {
     tabCalc.classList.add('active');
-    tabCapital.classList.remove('active');
-    capitalView.style.display = 'none';
     mainView.style.display = 'block';
-    settingsView.style.display = 'none';
-  } else {
+  } else if (tab === 'capital') {
     tabCapital.classList.add('active');
-    tabCalc.classList.remove('active');
-    mainView.style.display = 'none';
-    settingsView.style.display = 'none';
     capitalView.style.display = 'block';
+  } else {
+    tabFixed.classList.add('active');
+    fixedView.style.display = 'block';
   }
 }
 
 tabCalc.addEventListener('click', () => showTab('calc'));
 tabCapital.addEventListener('click', () => showTab('capital'));
+tabFixed.addEventListener('click', () => showTab('fixed'));
 
 settingsBtn.addEventListener('click', showSettings);
 backBtn.addEventListener('click', showMain);
@@ -238,7 +246,7 @@ function renderSplitColumn(items, containerEl, btnRowEl, type) {
   addBtn.addEventListener('click', () => {
     items.push({ amount: '', label: '' });
     renderSplitColumn(items, containerEl, btnRowEl, type);
-    saveCapitalExpenses();
+    saveAllSplitData();
     const newFirstInput = containerEl.querySelector('.split-item:last-child .split-amount');
     if (newFirstInput) newFirstInput.focus();
   });
@@ -252,7 +260,7 @@ function renderSplitColumn(items, containerEl, btnRowEl, type) {
       items.pop();
       renderSplitColumn(items, containerEl, btnRowEl, type);
       updateSplitTotals();
-      saveCapitalExpenses();
+      saveAllSplitData();
     });
     btnRowEl.appendChild(removeBtn);
   }
@@ -296,7 +304,7 @@ function setupDragReorder(containerEl, items, btnRowEl, type) {
 
       renderSplitColumn(items, containerEl, btnRowEl, type);
       updateSplitTotals();
-      saveCapitalExpenses();
+      saveAllSplitData();
     });
   });
 }
@@ -332,6 +340,18 @@ function updateSplitTotals() {
   }
 }
 
+// ===== Fixed Monthly Expenses page (single column, same mechanism) =====
+const fixedItemsEl = document.getElementById('fixedItems');
+const fixedBtnRow = document.getElementById('fixedBtnRow');
+const fixedTotalEl = document.getElementById('fixedTotal');
+
+let fixedItems = [{ amount: '', label: '' }];
+
+function updateFixedTotal() {
+  const fixedSum = fixedItems.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+  fixedTotalEl.textContent = round2(fixedSum).toLocaleString('en-US');
+}
+
 document.addEventListener('input', (e) => {
   const target = e.target;
   const type = target.getAttribute('data-type');
@@ -339,79 +359,37 @@ document.addEventListener('input', (e) => {
   const field = target.getAttribute('data-field');
   if (type === null || idx === null || field === null) return;
 
-  const items = type === 'capital' ? capitalItems : expenseItems;
+  let items;
+  if (type === 'capital') items = capitalItems;
+  else if (type === 'expense') items = expenseItems;
+  else if (type === 'fixed') items = fixedItems;
+  else return;
+
   items[parseInt(idx, 10)][field] = target.value;
-  updateSplitTotals();
-  saveCapitalExpenses();
+
+  if (type === 'fixed') {
+    updateFixedTotal();
+  } else {
+    updateSplitTotals();
+  }
+  saveAllSplitData();
 });
 
-function saveCapitalExpenses() {
-  chrome.storage.local.set({ capitalItems, expenseItems });
+function saveAllSplitData() {
+  chrome.storage.local.set({ capitalItems, expenseItems, fixedItems });
 }
 
 function initSplitColumns() {
-  chrome.storage.local.get(['capitalItems', 'expenseItems'], (data) => {
+  chrome.storage.local.get(['capitalItems', 'expenseItems', 'fixedItems'], (data) => {
     if (data.capitalItems && data.capitalItems.length) capitalItems = data.capitalItems;
     if (data.expenseItems && data.expenseItems.length) expenseItems = data.expenseItems;
+    if (data.fixedItems && data.fixedItems.length) fixedItems = data.fixedItems;
     renderSplitColumn(capitalItems, capitalItemsEl, capitalBtnRow, 'capital');
     renderSplitColumn(expenseItems, expenseItemsEl, expenseBtnRow, 'expense');
+    renderSplitColumn(fixedItems, fixedItemsEl, fixedBtnRow, 'fixed');
     updateSplitTotals();
+    updateFixedTotal();
   });
 }
 
 initSplitColumns();
-
-// ===== Export / Import data as a text code =====
-const exportBtn = document.getElementById('exportBtn');
-const importBtn = document.getElementById('importBtn');
-const importText = document.getElementById('importText');
-const exportImportStatus = document.getElementById('exportImportStatus');
-
-function showStatus(msg, isError) {
-  exportImportStatus.textContent = msg;
-  exportImportStatus.style.color = isError ? 'var(--danger)' : 'var(--success-text)';
-  setTimeout(() => { exportImportStatus.textContent = ''; }, 3500);
-}
-
-exportBtn.addEventListener('click', () => {
-  const payload = { capitalItems, expenseItems };
-  const code = 'MOTOCALC1:' + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(code)
-      .then(() => showStatus('تم نسخ الكود! الصقه في الجهاز التاني'))
-      .catch(() => {
-        importText.value = code;
-        showStatus('انسخ الكود يدويًا من الصندوق تحت');
-      });
-  } else {
-    importText.value = code;
-    showStatus('انسخ الكود يدويًا من الصندوق تحت');
-  }
-});
-
-importBtn.addEventListener('click', () => {
-  const raw = importText.value.trim();
-  if (!raw.startsWith('MOTOCALC1:')) {
-    showStatus('الكود غير صحيح أو غير مكتمل', true);
-    return;
-  }
-  try {
-    const json = decodeURIComponent(escape(atob(raw.slice('MOTOCALC1:'.length))));
-    const payload = JSON.parse(json);
-    if (!Array.isArray(payload.capitalItems) || !Array.isArray(payload.expenseItems)) {
-      throw new Error('invalid shape');
-    }
-    capitalItems = payload.capitalItems;
-    expenseItems = payload.expenseItems;
-    renderSplitColumn(capitalItems, capitalItemsEl, capitalBtnRow, 'capital');
-    renderSplitColumn(expenseItems, expenseItemsEl, expenseBtnRow, 'expense');
-    updateSplitTotals();
-    saveCapitalExpenses();
-    importText.value = '';
-    showStatus('تم استيراد البيانات بنجاح');
-  } catch (e) {
-    showStatus('تعذّر قراءة الكود، تأكد إنه منسوخ كامل', true);
-  }
-});
-})();

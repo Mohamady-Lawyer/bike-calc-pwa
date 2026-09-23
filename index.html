@@ -34,6 +34,7 @@
     <div class="sub-tabs">
       <button id="tabCalc" class="tab-btn active">الحاسبة</button>
       <button id="tabCapital" class="tab-btn">رأس مال ومصروفات</button>
+      <button id="tabFixed" class="tab-btn">مصاريف شهرية ثابتة</button>
     </div>
 
     <!-- MAIN VIEW -->
@@ -168,6 +169,19 @@
         <textarea id="importText" placeholder="الصق كود البيانات هنا..." style="width:100%; min-height:60px; padding:8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--input-text); font-family:'JetBrains Mono',monospace; font-size:11px; direction:ltr; margin-bottom:8px; resize:vertical;"></textarea>
         <button id="importBtn" class="calc-btn">استيراد البيانات</button>
         <div id="exportImportStatus" style="text-align:center; font-size:11px; color:var(--label-color); margin-top:6px;"></div>
+      </div>
+    </div>
+
+    <!-- FIXED MONTHLY EXPENSES VIEW -->
+    <div id="fixedView" style="display:none;">
+      <div class="split-col-full">
+        <div class="split-title">مصاريف شهرية ثابتة</div>
+        <div id="fixedItems"></div>
+        <div class="split-btn-row" id="fixedBtnRow"></div>
+        <div class="split-total fixed-total">
+          <span class="split-total-label">الإجمالي</span>
+          <span class="split-total-value" id="fixedTotal">0</span>
+        </div>
       </div>
     </div>
 
