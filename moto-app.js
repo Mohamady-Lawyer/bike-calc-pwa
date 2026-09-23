@@ -393,3 +393,88 @@ function initSplitColumns() {
 }
 
 initSplitColumns();
+
+// ===== Export / Import ALL Moto tab data as a text code =====
+const exportBtn = document.getElementById('exportBtn');
+const importBtn = document.getElementById('importBtn');
+const importText = document.getElementById('importText');
+const exportImportStatus = document.getElementById('exportImportStatus');
+
+function showExportImportStatus(msg, isError) {
+  exportImportStatus.textContent = msg;
+  exportImportStatus.style.color = isError ? 'var(--danger)' : 'var(--success-text)';
+  setTimeout(() => { exportImportStatus.textContent = ''; }, 3500);
+}
+
+exportBtn.addEventListener('click', () => {
+  const inputsValues = {};
+  inputIds.forEach((id) => {
+    inputsValues[id] = document.getElementById(id).value;
+  });
+
+  const payload = {
+    inputs: inputsValues,
+    darkMode: document.body.classList.contains('dark'),
+    capitalItems,
+    expenseItems,
+    fixedItems
+  };
+  const code = 'MOTOCALC2:' + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code)
+      .then(() => showExportImportStatus('تم نسخ الكود! الصقه في الجهاز التاني'))
+      .catch(() => {
+        importText.value = code;
+        showExportImportStatus('انسخ الكود يدويًا من الصندوق تحت');
+      });
+  } else {
+    importText.value = code;
+    showExportImportStatus('انسخ الكود يدويًا من الصندوق تحت');
+  }
+});
+
+importBtn.addEventListener('click', () => {
+  const raw = importText.value.trim();
+  if (!raw.startsWith('MOTOCALC2:')) {
+    showExportImportStatus('الكود غير صحيح أو غير مكتمل', true);
+    return;
+  }
+  try {
+    const json = decodeURIComponent(escape(atob(raw.slice('MOTOCALC2:'.length))));
+    const payload = JSON.parse(json);
+    if (!payload.inputs || !Array.isArray(payload.capitalItems) || !Array.isArray(payload.expenseItems)) {
+      throw new Error('invalid shape');
+    }
+
+    // Apply calculator inputs & settings
+    inputIds.forEach((id) => {
+      if (payload.inputs[id] !== undefined) {
+        document.getElementById(id).value = payload.inputs[id];
+      }
+    });
+    saveInputs();
+
+    // Apply dark mode
+    applyDarkMode(!!payload.darkMode);
+    chrome.storage.local.set({ darkMode: !!payload.darkMode });
+    if (typeof syncInterestDarkIcon === 'function') syncInterestDarkIcon(!!payload.darkMode);
+
+    // Apply capital / expenses / fixed
+    capitalItems = payload.capitalItems;
+    expenseItems = payload.expenseItems;
+    fixedItems = Array.isArray(payload.fixedItems) && payload.fixedItems.length ? payload.fixedItems : [{ amount: '', label: '' }];
+    renderSplitColumn(capitalItems, capitalItemsEl, capitalBtnRow, 'capital');
+    renderSplitColumn(expenseItems, expenseItemsEl, expenseBtnRow, 'expense');
+    renderSplitColumn(fixedItems, fixedItemsEl, fixedBtnRow, 'fixed');
+    updateSplitTotals();
+    updateFixedTotal();
+    saveAllSplitData();
+
+    calculate();
+    importText.value = '';
+    showExportImportStatus('تم استيراد كل بيانات الموتوسيكل بنجاح');
+  } catch (e) {
+    showExportImportStatus('تعذّر قراءة الكود، تأكد إنه منسوخ كامل', true);
+  }
+});

@@ -132,6 +132,14 @@
         </div>
       </div>
 
+      <div class="card" style="margin-top:12px;">
+        <h2>نقل البيانات بين الأجهزة</h2>
+        <button id="exportBtn" class="calc-btn back-btn" style="margin-bottom:8px;">نسخ كود البيانات</button>
+        <textarea id="importText" placeholder="الصق كود البيانات هنا..." style="width:100%; min-height:60px; padding:8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--input-text); font-family:'JetBrains Mono',monospace; font-size:11px; direction:ltr; margin-bottom:8px; resize:vertical;"></textarea>
+        <button id="importBtn" class="calc-btn">استيراد البيانات</button>
+        <div id="exportImportStatus" style="text-align:center; font-size:11px; color:var(--label-color); margin-top:6px;"></div>
+      </div>
+
       <button id="backBtn" class="calc-btn back-btn">رجوع للحاسبة</button>
     </div>
 
@@ -161,14 +169,6 @@
       <div class="deficit-card" id="deficitCard" style="display:none;">
         <span class="split-total-label">العجز</span>
         <span class="split-total-value" id="deficitValue">0</span>
-      </div>
-
-      <div class="card" style="margin-top:12px;">
-        <h2>نقل البيانات بين الأجهزة</h2>
-        <button id="exportBtn" class="calc-btn back-btn" style="margin-bottom:8px;">نسخ كود البيانات</button>
-        <textarea id="importText" placeholder="الصق كود البيانات هنا..." style="width:100%; min-height:60px; padding:8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--input-text); font-family:'JetBrains Mono',monospace; font-size:11px; direction:ltr; margin-bottom:8px; resize:vertical;"></textarea>
-        <button id="importBtn" class="calc-btn">استيراد البيانات</button>
-        <div id="exportImportStatus" style="text-align:center; font-size:11px; color:var(--label-color); margin-top:6px;"></div>
       </div>
     </div>
 
