@@ -221,6 +221,11 @@ body.dark {
   box-shadow: 0 0 8px var(--result-border);
 }
 
+.back-arrow-btn {
+  width: 76px;
+  border-color: var(--icon-color);
+}
+
 /* ===== Sub-tabs (Moto: calc/settings/capital/fixed nav) ===== */
 .sub-tabs {
   display: flex;

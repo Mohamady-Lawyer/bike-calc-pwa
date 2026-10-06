@@ -14,7 +14,8 @@ const mainView = document.getElementById('mainView');
 const settingsView = document.getElementById('settingsView');
 const capitalView = document.getElementById('capitalView');
 const fixedView = document.getElementById('fixedView');
-const pageTitle = document.getElementById('pageTitle');
+const pageTitle = document.getElementById('motoPageTitle');
+const backArrowBtn = document.getElementById('backArrowBtn');
 const tabCalc = document.getElementById('tabCalc');
 const tabCapital = document.getElementById('tabCapital');
 const tabFixed = document.getElementById('tabFixed');
@@ -23,7 +24,7 @@ function showSettings() {
   mainView.style.display = 'none';
   settingsView.style.display = 'block';
   pageTitle.textContent = 'الإعدادات';
-  settingsBtn.style.display = 'none';
+  backArrowBtn.style.display = 'flex';
 }
 
 function showMain() {
@@ -32,7 +33,7 @@ function showMain() {
   fixedView.style.display = 'none';
   mainView.style.display = 'block';
   pageTitle.textContent = 'حاسبة أرباح الموتوسيكل';
-  settingsBtn.style.display = 'inline-block';
+  backArrowBtn.style.display = 'none';
   calculate();
 }
 
@@ -44,6 +45,8 @@ function showTab(tab) {
   settingsView.style.display = 'none';
   capitalView.style.display = 'none';
   fixedView.style.display = 'none';
+  pageTitle.textContent = 'حاسبة أرباح الموتوسيكل';
+  backArrowBtn.style.display = 'none';
 
   if (tab === 'calc') {
     tabCalc.classList.add('active');
@@ -61,7 +64,14 @@ tabCalc.addEventListener('click', () => showTab('calc'));
 tabCapital.addEventListener('click', () => showTab('capital'));
 tabFixed.addEventListener('click', () => showTab('fixed'));
 
-settingsBtn.addEventListener('click', showSettings);
+settingsBtn.addEventListener('click', () => {
+  if (settingsView.style.display === 'block') {
+    showMain();
+  } else if (mainView.style.display !== 'none') {
+    showSettings();
+  }
+});
+backArrowBtn.addEventListener('click', showMain);
 backBtn.addEventListener('click', showMain);
 
 
