@@ -12,16 +12,33 @@
 </head>
 <body class="dark">
 
-  <div class="app-tabs">
-    <button id="appTabMoto" class="app-tab-btn active">🏍️ الموتوسيكل</button>
-    <button id="appTabInterest" class="app-tab-btn">◐ الفائدة</button>
+  <!-- ============ GATE ============ -->
+  <div id="gateView" class="view-page gate active">
+    <div class="gate-hero">
+      <div class="gate-logo"><div class="gate-logo-plate"><img src="icons/icon128.png" alt=""></div></div>
+      <h1 class="gate-title">حاسبة الموتوسيكل</h1>
+      <p class="gate-sub">اختر الحاسبة</p>
+    </div>
+    <div class="gate-actions">
+      <button id="gateMotoBtn" class="gate-card">
+        <span class="gate-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17" r="3"/><circle cx="18.5" cy="17" r="3"/><path d="M5.5 17l4-8h5l4 8"/><path d="M14.5 9l1.5-3h2.5"/><path d="M9.5 9H7"/></svg></span>
+        <span class="gate-text"><b>حاسبة أرباح الموتوسيكل</b><small>الدخل والمصاريف وصافي الربح</small></span>
+        <span class="gate-chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></span>
+      </button>
+      <button id="gateInterestBtn" class="gate-card">
+        <span class="gate-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7.5" cy="7.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/><path d="M19 5L5 19"/></svg></span>
+        <span class="gate-text"><b>حاسبة الفائدة</b><small>الفائدة العادية وفائدة القرض</small></span>
+        <span class="gate-chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></span>
+      </button>
+    </div>
   </div>
 
   <!-- ============ MOTO APP ============ -->
-  <div id="motoApp" class="view-page active">
+  <div id="motoApp" class="view-page">
 
     <div class="page-header">
       <div class="page-title">
+        <button id="gateBackMoto" class="gate-arrow" title="رجوع للبوابة" aria-label="رجوع للبوابة"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16"/><path d="M14 6l6 6-6 6"/></svg></button>
         <img src="icons/icon48.png" alt="logo">
         <span id="motoPageTitle">حاسبة أرباح الموتوسيكل</span>
       </div>
@@ -193,6 +210,7 @@
     <div class="card">
       <div class="page-header" style="margin-bottom:14px;">
         <div class="page-title">
+          <button id="gateBackInterest" class="gate-arrow" title="رجوع للبوابة" aria-label="رجوع للبوابة"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16"/><path d="M14 6l6 6-6 6"/></svg></button>
           <img src="icons/icon48.png" alt="logo" style="opacity:0;width:0;height:0;">
           <span>حاسبة الفائدة</span>
         </div>

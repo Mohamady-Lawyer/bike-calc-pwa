@@ -16,6 +16,7 @@ const capitalView = document.getElementById('capitalView');
 const fixedView = document.getElementById('fixedView');
 const pageTitle = document.getElementById('motoPageTitle');
 const backArrowBtn = document.getElementById('backArrowBtn');
+const gateBackMoto = document.getElementById('gateBackMoto');
 const tabCalc = document.getElementById('tabCalc');
 const tabCapital = document.getElementById('tabCapital');
 const tabFixed = document.getElementById('tabFixed');
@@ -25,6 +26,7 @@ function showSettings() {
   settingsView.style.display = 'block';
   pageTitle.textContent = 'الإعدادات';
   backArrowBtn.style.display = 'flex';
+  gateBackMoto.style.display = 'none';
 }
 
 function showMain() {
@@ -34,6 +36,7 @@ function showMain() {
   mainView.style.display = 'block';
   pageTitle.textContent = 'حاسبة أرباح الموتوسيكل';
   backArrowBtn.style.display = 'none';
+  gateBackMoto.style.display = '';
   calculate();
 }
 
@@ -47,6 +50,7 @@ function showTab(tab) {
   fixedView.style.display = 'none';
   pageTitle.textContent = 'حاسبة أرباح الموتوسيكل';
   backArrowBtn.style.display = 'none';
+  gateBackMoto.style.display = '';
 
   if (tab === 'calc') {
     tabCalc.classList.add('active');
