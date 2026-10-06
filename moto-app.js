@@ -1,7 +1,7 @@
 const inputIds = [
   'dailyKm', 'kmPrice', 'tripKm',
   'fuelRate', 'fuel92Price', 'serviceFee',
-  'maintenanceRatio', 'oilRatio', 'otherRatio', 'companyRatio'
+  'maintenanceRatio', 'oilPerKm', 'otherRatio', 'companyRatio'
 ];
 
 const fuel92PriceInput = document.getElementById('fuel92Price');
@@ -87,7 +87,7 @@ function calculate() {
   const fuelRate = parseFloat(document.getElementById('fuelRate').value) || 0;
   const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
   const maintenanceRatio = parseFloat(document.getElementById('maintenanceRatio').value) || 0;
-  const oilRatio = parseFloat(document.getElementById('oilRatio').value) || 0;
+  const oilPerKm = parseFloat(document.getElementById('oilPerKm').value) || 0;
   const otherRatio = parseFloat(document.getElementById('otherRatio').value) || 0;
   const companyRatio = parseFloat(document.getElementById('companyRatio').value) || 0;
 
@@ -100,7 +100,7 @@ function calculate() {
   const fuelCost = totalLiters * fuelPrice;
   // Maintenance, oil & other expenses derived from fuel cost
   const maintenanceCost = fuelCost * maintenanceRatio;
-  const oilCost = fuelCost * oilRatio;
+  const oilCost = oilPerKm * dailyKm;
   const otherCost = fuelCost * otherRatio;
 
   // Total daily income, based on profit-basis distance
@@ -148,7 +148,7 @@ function setupEnterNavigation() {
 
   const settingsFields = [
     'fuelRate', 'fuel92Price', 'serviceFee',
-    'maintenanceRatio', 'oilRatio', 'otherRatio', 'companyRatio'
+    'maintenanceRatio', 'oilPerKm', 'otherRatio', 'companyRatio'
   ].map((id) => document.getElementById(id));
   settingsFields.forEach((el, idx) => {
     el.addEventListener('keydown', (e) => {
