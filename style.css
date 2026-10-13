@@ -869,3 +869,146 @@ body.dark .gate-arrow {
   .page-title { font-size: 13.5px; gap: 6px; }
   .page-title img { width: 18px; height: 18px; }
 }
+
+
+/* ===== Extra daily expense items (settings) ===== */
+.custom-sep {
+  margin: 12px 0 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--divider-color);
+  font-size: 11px;
+  color: var(--label-color);
+}
+
+.custom-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.custom-name,
+.custom-amount {
+  padding: 7px 8px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.custom-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.custom-amount {
+  width: 76px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  direction: ltr;
+}
+
+.custom-name:hover,
+.custom-amount:hover {
+  border-color: var(--accent-1);
+}
+
+.custom-name:focus,
+.custom-amount:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.custom-del {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.custom-del:hover {
+  border-color: var(--danger);
+}
+
+.custom-add-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border: 1px dashed var(--accent-1);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--accent-1);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.custom-add-btn:hover {
+  background: var(--result-grad-1);
+  box-shadow: 0 0 10px var(--result-border);
+}
+
+/* ===== Loan: daily installment + total debt ===== */
+.loan-only.hidden {
+  display: none;
+}
+
+.result-row.result-row-sub {
+  margin-top: 8px;
+  background: transparent;
+  padding: 9px 14px;
+}
+
+.result-row.result-row-sub .result-value {
+  font-size: 16px;
+}
+
+.debt-card {
+  margin-top: 8px;
+  padding: 14px 12px;
+  text-align: center;
+  border: 1px solid var(--accent-1);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--result-grad-1), var(--result-grad-2));
+  box-shadow: 0 0 16px var(--result-border);
+}
+
+.debt-label {
+  font-size: 12.5px;
+  color: var(--result-label-color);
+}
+
+.debt-value {
+  margin: 2px 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--result-value-color);
+  text-shadow: 0 0 12px var(--result-value-glow);
+}
+
+.debt-sub {
+  font-size: 12px;
+  color: var(--label-color);
+}
+
+.debt-sub span {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 600;
+}

@@ -4,6 +4,11 @@ const inputIds = [
   'maintenanceRatio', 'oilPerKm', 'otherAmount', 'companyRatio'
 ];
 
+let customExpenses = [];
+const customItemsEl = document.getElementById('customItems');
+const addCustomBtn = document.getElementById('addCustomBtn');
+const bdCustomRows = document.getElementById('bdCustomRows');
+
 const fuel92PriceInput = document.getElementById('fuel92Price');
 const serviceFeeInput = document.getElementById('serviceFee');
 const fuelPriceInput = document.getElementById('fuelPrice');
@@ -123,7 +128,8 @@ function calculate() {
   const companyCommission = dailyIncome * companyRatio;
 
   // Total daily expenses = fuel + maintenance + oil + other + company commission
-  const dailyExpenses = fuelCost + maintenanceCost + oilCost + otherCost + companyCommission;
+  const customTotal = customExpenses.reduce((sum, it) => sum + (parseFloat(it.amount) || 0), 0);
+  const dailyExpenses = fuelCost + maintenanceCost + oilCost + otherCost + companyCommission + customTotal;
 
   // Net expected profit
   const dailyNetProfit = dailyIncome - dailyExpenses;
@@ -141,6 +147,7 @@ function calculate() {
   document.getElementById('bdOil').textContent = round2(oilCost).toLocaleString('en-US');
   document.getElementById('bdOther').textContent = round2(otherCost).toLocaleString('en-US');
   document.getElementById('bdCompany').textContent = round2(companyCommission).toLocaleString('en-US');
+  renderCustomBreakdown();
 }
 
 
@@ -160,22 +167,28 @@ function setupEnterNavigation() {
     });
   });
 
-  const settingsFields = [
+  settingsFixedFields().forEach((el) => {
+    el.addEventListener('keydown', (e) => onSettingsEnter(e, el));
+  });
+}
+
+function settingsFixedFields() {
+  return [
     'fuelRate', 'fuel92Price', 'serviceFee',
     'maintenanceRatio', 'oilPerKm', 'otherAmount', 'companyRatio'
   ].map((id) => document.getElementById(id));
-  settingsFields.forEach((el, idx) => {
-    el.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (idx < settingsFields.length - 1) {
-          settingsFields[idx + 1].focus();
-        } else {
-          showMain();
-        }
-      }
-    });
-  });
+}
+
+function onSettingsEnter(e, el) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const order = settingsFixedFields().concat(Array.from(customItemsEl.querySelectorAll('input')));
+  const idx = order.indexOf(el);
+  if (idx < order.length - 1) {
+    order[idx + 1].focus();
+  } else {
+    showMain();
+  }
 }
 setupEnterNavigation();
 
@@ -196,8 +209,10 @@ darkModeBtn.addEventListener('click', () => {
   if (typeof syncInterestDarkIcon === 'function') syncInterestDarkIcon(isDark);
 });
 
-chrome.storage.local.get(['darkMode', 'inputs'], (data) => {
+chrome.storage.local.get(['darkMode', 'inputs', 'customExpenses'], (data) => {
   applyDarkMode(data.darkMode !== false); // default dark
+  if (Array.isArray(data.customExpenses)) customExpenses = sanitizeCustom(data.customExpenses);
+  renderCustomItems();
   if (data.inputs) {
     inputIds.forEach((id) => {
       if (data.inputs[id] !== undefined) {
@@ -222,6 +237,99 @@ inputIds.forEach((id) => {
     calculate();
     saveInputs();
   });
+});
+
+// ===== Extra daily expense items (settings) =====
+const TRASH_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>';
+
+function sanitizeCustom(list) {
+  return list.map((it) => ({
+    label: String((it && it.label) || ''),
+    amount: it && it.amount !== undefined && it.amount !== null ? it.amount : ''
+  }));
+}
+
+function saveCustomExpenses() {
+  chrome.storage.local.set({ customExpenses });
+}
+
+function renderCustomItems() {
+  customItemsEl.innerHTML = '';
+  customExpenses.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'custom-item';
+
+    const name = document.createElement('input');
+    name.type = 'text';
+    name.className = 'custom-name';
+    name.placeholder = 'اسم البند';
+    name.setAttribute('aria-label', 'اسم البند');
+    name.value = item.label;
+
+    const amount = document.createElement('input');
+    amount.type = 'number';
+    amount.className = 'custom-amount';
+    amount.step = 'any';
+    amount.min = '0';
+    amount.placeholder = '0';
+    amount.setAttribute('aria-label', 'المبلغ اليومي');
+    amount.value = item.amount;
+
+    const del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'custom-del';
+    del.setAttribute('aria-label', 'حذف البند');
+    del.innerHTML = TRASH_SVG;
+
+    name.addEventListener('input', () => {
+      customExpenses[idx].label = name.value;
+      saveCustomExpenses();
+      calculate();
+    });
+    amount.addEventListener('input', () => {
+      customExpenses[idx].amount = amount.value;
+      saveCustomExpenses();
+      calculate();
+    });
+    del.addEventListener('click', () => {
+      customExpenses.splice(idx, 1);
+      renderCustomItems();
+      saveCustomExpenses();
+      calculate();
+    });
+    name.addEventListener('keydown', (e) => onSettingsEnter(e, name));
+    amount.addEventListener('keydown', (e) => onSettingsEnter(e, amount));
+
+    row.appendChild(name);
+    row.appendChild(amount);
+    row.appendChild(del);
+    customItemsEl.appendChild(row);
+  });
+}
+
+function renderCustomBreakdown() {
+  bdCustomRows.innerHTML = '';
+  customExpenses.forEach((item) => {
+    const amt = parseFloat(item.amount) || 0;
+    if (!item.label && amt === 0) return;
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    const l = document.createElement('span');
+    l.textContent = item.label || 'بند إضافي';
+    const v = document.createElement('span');
+    v.textContent = round2(amt).toLocaleString('en-US');
+    row.appendChild(l);
+    row.appendChild(v);
+    bdCustomRows.appendChild(row);
+  });
+}
+
+addCustomBtn.addEventListener('click', () => {
+  customExpenses.push({ label: '', amount: '' });
+  renderCustomItems();
+  saveCustomExpenses();
+  const last = customItemsEl.querySelector('.custom-item:last-child .custom-name');
+  if (last) last.focus();
 });
 
 // ===== Capital & Expenses page =====
@@ -431,7 +539,8 @@ exportBtn.addEventListener('click', () => {
     darkMode: document.body.classList.contains('dark'),
     capitalItems,
     expenseItems,
-    fixedItems
+    fixedItems,
+    customExpenses
   };
   const code = 'MOTOCALC2:' + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
 
@@ -468,6 +577,13 @@ importBtn.addEventListener('click', () => {
       }
     });
     saveInputs();
+
+    // Apply extra daily expense items (absent in older codes: keep current)
+    if (Array.isArray(payload.customExpenses)) {
+      customExpenses = sanitizeCustom(payload.customExpenses);
+      renderCustomItems();
+      saveCustomExpenses();
+    }
 
     // Apply dark mode
     applyDarkMode(!!payload.darkMode);

@@ -9,6 +9,11 @@ const amountLabel = document.getElementById("amountLabel");
 const darkToggle = document.getElementById("darkToggle");
 const modeSimpleBtn = document.getElementById("modeSimpleBtn");
 const modeLoanBtn = document.getElementById("modeLoanBtn");
+const dailyRow = document.getElementById("dailyRow");
+const dailyValue = document.getElementById("dailyValue");
+const debtCard = document.getElementById("debtCard");
+const debtValue = document.getElementById("debtValue");
+const debtInterest = document.getElementById("debtInterest");
 
 let mode = "simple"; // "simple" | "loan"
 
@@ -20,6 +25,13 @@ const state = {
 
 function round2(n) {
   return Math.round(n * 100) / 100;
+}
+
+function fmtMoney(n) {
+  return n.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 function getRawAmount() {
@@ -66,6 +78,12 @@ function calculate() {
       (totalInterestRateFraction * amount + amount) / duration
     );
     resultValue.textContent = `${monthlyInstallment.toFixed(2)} جنيه`;
+
+    const totalInterest = round2(totalInterestRateFraction * amount);
+    const totalDebt = round2(amount + totalInterest);
+    dailyValue.textContent = `${round2(monthlyInstallment / 30).toFixed(2)} جنيه`;
+    debtValue.textContent = `${fmtMoney(totalDebt)} جنيه`;
+    debtInterest.textContent = fmtMoney(totalInterest);
     chrome.storage.local.set({ loanState: state.loan });
   }
 }
@@ -85,12 +103,16 @@ function setMode(newMode) {
     modeSimpleBtn.classList.add("active");
     modeLoanBtn.classList.remove("active");
     durationBox.classList.add("hidden");
+    dailyRow.classList.add("hidden");
+    debtCard.classList.add("hidden");
     amountLabel.textContent = "المبلغ (جنيه)";
     resultLabel.textContent = "الفائدة الشهرية";
   } else {
     modeLoanBtn.classList.add("active");
     modeSimpleBtn.classList.remove("active");
     durationBox.classList.remove("hidden");
+    dailyRow.classList.remove("hidden");
+    debtCard.classList.remove("hidden");
     amountLabel.textContent = "مبلغ القرض (جنيه)";
     resultLabel.textContent = "القسط الشهري";
   }

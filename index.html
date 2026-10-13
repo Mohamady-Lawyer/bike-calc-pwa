@@ -22,7 +22,7 @@
     <div class="gate-actions">
       <button id="gateMotoBtn" class="gate-card">
         <span class="gate-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17" r="3"/><circle cx="18.5" cy="17" r="3"/><path d="M5.5 17l4-8h5l4 8"/><path d="M14.5 9l1.5-3h2.5"/><path d="M9.5 9H7"/></svg></span>
-        <span class="gate-text"><b>حاسبة أرباح الموتوسيكل</b><small>الدخل والمصاريف وصافي الربح</small></span>
+        <span class="gate-text"><b>حاسبة أرباح الموتوسيكل</b><small>إجمالي الدخل والمصاريف وصافي الدخل</small></span>
         <span class="gate-chev"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></span>
       </button>
       <button id="gateInterestBtn" class="gate-card">
@@ -95,10 +95,11 @@
             <div class="breakdown-row"><span>زيت موتوسيكلات</span><span id="bdOil">0</span></div>
             <div class="breakdown-row"><span>مصاريف أخرى</span><span id="bdOther">0</span></div>
             <div class="breakdown-row"><span>عمولة الشركة</span><span id="bdCompany">0</span></div>
+            <div id="bdCustomRows" style="display:contents;"></div>
           </div>
         </div>
         <div class="result-box highlight">
-          <span class="result-label">صافي الربح المتوقع</span>
+          <span class="result-label">صافي الدخل المتوقع</span>
           <span class="result-value" id="dailyNetProfit">0</span>
           <div class="breakdown">
             <div class="breakdown-row"><span>شهر 26 يوم</span><span id="bdMonth26">0</span></div>
@@ -148,6 +149,9 @@
           <label>نسبة عمولة الشركة (من إجمالي الدخل)</label>
           <input type="number" id="companyRatio" value="0.15" step="0.01">
         </div>
+        <div class="custom-sep">بنود إضافية (مبلغ يومي ثابت)</div>
+        <div id="customItems"></div>
+        <button id="addCustomBtn" type="button" class="custom-add-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة بند</span></button>
       </div>
 
       <div class="card" style="margin-top:12px;">
@@ -242,6 +246,17 @@
       <div class="result-row">
         <span class="result-label" id="resultLabel">الفائدة الشهرية</span>
         <span class="result-value" id="resultValue">0 جنيه</span>
+      </div>
+
+      <div class="result-row result-row-sub loan-only hidden" id="dailyRow">
+        <span class="result-label">القسط اليومي</span>
+        <span class="result-value" id="dailyValue">0 جنيه</span>
+      </div>
+
+      <div class="debt-card loan-only hidden" id="debtCard">
+        <div class="debt-label">إجمالي الدين</div>
+        <div class="debt-value" id="debtValue">0 جنيه</div>
+        <div class="debt-sub">إجمالي الفائدة <span id="debtInterest">0</span></div>
       </div>
     </div>
   </div>
