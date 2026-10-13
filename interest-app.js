@@ -9,6 +9,7 @@ const amountLabel = document.getElementById("amountLabel");
 const darkToggle = document.getElementById("darkToggle");
 const modeSimpleBtn = document.getElementById("modeSimpleBtn");
 const modeLoanBtn = document.getElementById("modeLoanBtn");
+const ratePair = document.getElementById("ratePair");
 const dailyRow = document.getElementById("dailyRow");
 const dailyValue = document.getElementById("dailyValue");
 const debtCard = document.getElementById("debtCard");
@@ -103,6 +104,7 @@ function setMode(newMode) {
     modeSimpleBtn.classList.add("active");
     modeLoanBtn.classList.remove("active");
     durationBox.classList.add("hidden");
+    ratePair.classList.add("single");
     dailyRow.classList.add("hidden");
     debtCard.classList.add("hidden");
     amountLabel.textContent = "المبلغ (جنيه)";
@@ -111,6 +113,7 @@ function setMode(newMode) {
     modeLoanBtn.classList.add("active");
     modeSimpleBtn.classList.remove("active");
     durationBox.classList.remove("hidden");
+    ratePair.classList.remove("single");
     dailyRow.classList.remove("hidden");
     debtCard.classList.remove("hidden");
     amountLabel.textContent = "مبلغ القرض (جنيه)";

@@ -12,7 +12,7 @@ html, body {
 
 body {
   min-height: 100vh;
-  padding: 16px;
+  padding: 6px 16px 16px;
   max-width: 480px;
   margin: 0 auto;
 
@@ -669,8 +669,8 @@ body.dark .back-btn {
 /* ===== Entry gate ===== */
 .gate {
   position: relative;
-  min-height: calc(100vh - 32px);
-  min-height: calc(100dvh - 32px);
+  min-height: calc(100vh - 22px);
+  min-height: calc(100dvh - 22px);
 }
 
 .gate.active {
@@ -1011,4 +1011,70 @@ body.dark .gate-arrow {
 .debt-sub span {
   font-family: "JetBrains Mono", monospace;
   font-weight: 600;
+}
+
+
+/* ===== Side-by-side input pairs ===== */
+.pair-row {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.pair-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.pair-item label {
+  font-size: 11.5px;
+  color: var(--label-color);
+}
+
+.pair-item input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin-top: auto;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  padding: 7px 6px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--input-text);
+  direction: ltr;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pair-item input:focus {
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 3px var(--input-focus-ring);
+}
+
+.pair-item input[readonly] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.inputs-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.inputs-pair.single {
+  grid-template-columns: 1fr;
+}
+
+.inputs-pair > .input-box {
+  min-width: 0;
 }

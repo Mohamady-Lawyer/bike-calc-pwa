@@ -59,13 +59,15 @@
     <div id="mainView">
       <div class="card">
         <h2>المدخلات اليومية</h2>
-        <div class="row">
-          <label>المسافة المقطوعة (كم)</label>
-          <input type="number" id="dailyKm" value="200" step="1">
-        </div>
-        <div class="row">
-          <label>المسافة اليومية المحسوب عليها ربح (كم)</label>
-          <input type="number" id="profitKm" value="180" step="1" readonly>
+        <div class="pair-row">
+          <div class="pair-item">
+            <label>المسافة المقطوعة (كم)</label>
+            <input type="number" id="dailyKm" value="200" step="1">
+          </div>
+          <div class="pair-item">
+            <label>المسافة المقطوعة بربح (كم)</label>
+            <input type="number" id="profitKm" value="180" step="1" readonly>
+          </div>
         </div>
         <div class="row">
           <label>سعر الكيلومتر (جنيه)</label>
@@ -231,13 +233,15 @@
           <div class="label" id="amountLabel">المبلغ (جنيه)</div>
           <input type="text" inputmode="numeric" id="amountInput" value="100,000">
         </div>
-        <div class="input-box">
-          <div class="label">الفائدة السنوية (%)</div>
-          <input type="number" id="rateInput" step="1" min="0" value="12">
-        </div>
-        <div class="input-box loan-only hidden" id="durationBox">
-          <div class="label">مدة السداد (شهور)</div>
-          <input type="number" id="durationInput" step="1" min="1" value="24">
+        <div class="inputs-pair single" id="ratePair">
+          <div class="input-box">
+            <div class="label">الفائدة السنوية (%)</div>
+            <input type="number" id="rateInput" step="1" min="0" value="12">
+          </div>
+          <div class="input-box loan-only hidden" id="durationBox">
+            <div class="label">مدة السداد (شهور)</div>
+            <input type="number" id="durationInput" step="1" min="1" value="24">
+          </div>
         </div>
       </div>
 
