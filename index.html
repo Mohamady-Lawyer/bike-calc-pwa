@@ -11,6 +11,8 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="dark">
+  <div id="printHeader" class="print-only"><b id="printTitle"></b><span id="printDate"></span></div>
+
 
   <!-- ============ GATE ============ -->
   <div id="gateView" class="view-page gate active">
@@ -45,6 +47,13 @@
       <div class="header-btns">
         <button id="backArrowBtn" class="icon-btn back-arrow-btn" title="رجوع للحاسبة" aria-label="رجوع للحاسبة" style="display:none;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16"/><path d="M14 6l6 6-6 6"/></svg></button>
         <button id="settingsBtn" class="icon-btn" title="الإعدادات">⚙️</button>
+        <div class="print-wrap">
+          <button id="printBtn" class="icon-btn" type="button" title="طباعة" aria-label="طباعة" aria-haspopup="true" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><path d="M17 9V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4"/><rect x="7" y="13" width="10" height="8" rx="2"/></svg></button>
+          <div id="printMenu" class="print-menu" role="menu" hidden>
+            <button type="button" role="menuitem" data-print="current">طباعة الصفحة الحالية</button>
+            <button type="button" role="menuitem" data-print="all">طباعة الحاسبة كاملة</button>
+          </div>
+        </div>
         <button id="darkModeBtn" class="icon-btn" title="الوضع الليلي">☀️</button>
       </div>
     </div>
@@ -156,7 +165,7 @@
         <button id="addCustomBtn" type="button" class="custom-add-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة بند</span></button>
       </div>
 
-      <div class="card" style="margin-top:12px;">
+      <div class="card no-print" style="margin-top:12px;">
         <h2>نقل البيانات بين الأجهزة</h2>
         <button id="exportBtn" class="calc-btn back-btn" style="margin-bottom:8px;">نسخ كود البيانات</button>
         <textarea id="importText" placeholder="الصق كود البيانات هنا..." style="width:100%; min-height:60px; padding:8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--input-text); font-family:'JetBrains Mono',monospace; font-size:11px; direction:ltr; margin-bottom:8px; resize:vertical;"></textarea>
@@ -164,7 +173,7 @@
         <div id="exportImportStatus" style="text-align:center; font-size:11px; color:var(--label-color); margin-top:6px;"></div>
       </div>
 
-      <button id="backBtn" class="calc-btn back-btn">رجوع للحاسبة</button>
+      <button id="backBtn" class="calc-btn back-btn no-print">رجوع للحاسبة</button>
     </div>
 
     <!-- CAPITAL & EXPENSES VIEW -->
@@ -220,7 +229,10 @@
           <img src="icons/icon48.png" alt="logo" style="opacity:0;width:0;height:0;">
           <span>حاسبة الفائدة</span>
         </div>
-        <button id="darkToggle" class="icon-btn" aria-label="تبديل الوضع الليلي">◐</button>
+        <div class="header-btns">
+          <button id="interestPrintBtn" class="icon-btn" type="button" title="طباعة" aria-label="طباعة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 17h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2"/><path d="M17 9V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v4"/><rect x="7" y="13" width="10" height="8" rx="2"/></svg></button>
+          <button id="darkToggle" class="icon-btn" aria-label="تبديل الوضع الليلي">◐</button>
+        </div>
       </div>
 
       <div class="mode-switch">

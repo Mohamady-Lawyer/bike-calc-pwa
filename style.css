@@ -1078,3 +1078,180 @@ body.dark .gate-arrow {
 .inputs-pair > .input-box {
   min-width: 0;
 }
+
+
+/* ===== Print button + menu ===== */
+.print-only {
+  display: none;
+}
+
+.print-wrap {
+  position: relative;
+}
+
+.print-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  min-width: 190px;
+  padding: 4px;
+  background: var(--card-grad-1);
+  border: 1px solid var(--accent-1);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.55);
+}
+
+.print-menu[hidden] {
+  display: none;
+}
+
+.print-menu button {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--title-color);
+  font-size: 13px;
+  text-align: right;
+  cursor: pointer;
+}
+
+.print-menu button:hover,
+.print-menu button:focus-visible {
+  outline: none;
+  background: var(--result-grad-1);
+  color: var(--accent-1);
+}
+
+/* ===== Print layout (always light, ink-friendly) ===== */
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body,
+  body.dark {
+    --bg-page: #fff;
+    --card-grad-1: #fff;
+    --card-grad-2: #fff;
+    --card-border: #9aa3a8;
+    --top-glow: transparent;
+    --title-color: #111;
+    --icon-bg: #fff;
+    --icon-border: #9aa3a8;
+    --icon-color: #0f6e56;
+    --switch-bg: #fff;
+    --switch-border: #9aa3a8;
+    --mode-text: #444;
+    --mode-text-hover: #444;
+    --mode-active-bg: #e6f4f0;
+    --mode-active-text: #0f6e56;
+    --mode-active-ring: #0f6e56;
+    --input-bg: #fff;
+    --input-border: #9aa3a8;
+    --input-focus-border: #9aa3a8;
+    --input-focus-ring: transparent;
+    --label-color: #444;
+    --input-text: #111;
+    --divider-color: #c9ced1;
+    --result-grad-1: #f1f8f6;
+    --result-grad-2: #f1f8f6;
+    --result-border: #0f6e56;
+    --result-label-color: #0f6e56;
+    --result-value-color: #0b5a46;
+    --result-value-glow: transparent;
+    --accent-1: #0f6e56;
+    --accent-2: #0f6e56;
+    --muted: #555;
+    --danger: #b3261e;
+    --success-text: #0f6e56;
+    --fixed-color: #8a5a00;
+    background: #fff;
+    color: #111;
+    max-width: none;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .print-only {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 0 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #0f6e56;
+    color: #111;
+  }
+
+  .print-only b {
+    font-size: 16px;
+  }
+
+  .print-only span {
+    font-size: 12px;
+    color: #444;
+  }
+
+  .gate,
+  .page-header,
+  .sub-tabs,
+  .mode-switch,
+  .print-menu,
+  .no-print,
+  .custom-del,
+  .custom-add-btn,
+  .split-btn-row {
+    display: none !important;
+  }
+
+  .card,
+  .split-col,
+  .split-col-full,
+  .deficit-card,
+  .debt-card {
+    break-inside: avoid;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Whole motorcycle calculator on one sheet */
+  body.print-all #motoApp {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-items: start;
+  }
+
+  body.print-all #mainView,
+  body.print-all #settingsView,
+  body.print-all #capitalView,
+  body.print-all #fixedView {
+    display: block !important;
+    min-width: 0;
+  }
+
+  body.print-all #mainView { grid-column: 1; grid-row: 1; }
+  body.print-all #settingsView { grid-column: 2; grid-row: 1; }
+  body.print-all #capitalView { grid-column: 1; grid-row: 2; }
+  body.print-all #fixedView { grid-column: 2; grid-row: 2; }
+}
