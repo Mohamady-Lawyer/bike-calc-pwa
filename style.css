@@ -1352,3 +1352,8 @@ body.dark .gate-arrow {
   padding-bottom: 8px;
   margin-bottom: 6px;
 }
+
+/* ===== Tighter gap under the calculator header ===== */
+#motoApp .page-header {
+  margin-bottom: 6px;
+}
