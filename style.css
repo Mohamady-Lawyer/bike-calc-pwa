@@ -1342,3 +1342,13 @@ body.dark .gate-arrow {
   font-weight: 600;
   color: var(--accent-1);
 }
+
+/* ===== Tighter spacing around the calculator inputs card ===== */
+.sub-tabs {
+  margin-bottom: 6px;
+}
+
+#mainView > .card {
+  padding-bottom: 8px;
+  margin-bottom: 6px;
+}
