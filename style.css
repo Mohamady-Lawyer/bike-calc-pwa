@@ -1261,25 +1261,18 @@ body.dark .gate-arrow {
 .results.results-flow {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .result-pair {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 
 .result-pair > .result-box {
   flex: 1;
   min-width: 0;
-}
-
-.flow-label {
-  margin: -4px 0;
-  text-align: center;
-  font-size: 11px;
-  color: var(--label-color);
 }
 
 .extras-box {
@@ -1316,7 +1309,7 @@ body.dark .gate-arrow {
 }
 
 .net-box {
-  padding: 12px;
+  padding: 10px 12px;
 }
 
 .net-box .result-value {
@@ -1326,8 +1319,8 @@ body.dark .gate-arrow {
 .month-row {
   display: flex;
   gap: 8px;
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: 6px;
+  padding-top: 6px;
   border-top: 1px solid var(--divider-color);
 }
 

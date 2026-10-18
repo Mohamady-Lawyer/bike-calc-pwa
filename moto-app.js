@@ -1,5 +1,5 @@
 const inputIds = [
-  'dailyKm', 'kmPrice', 'tripKm',
+  'dailyKm', 'kmPrice',
   'fuelRate', 'fuel92Price', 'serviceFee',
   'maintenanceRatio', 'oilPerKm', 'otherAmount', 'companyRatio'
 ];
@@ -152,7 +152,7 @@ function calculate() {
 
 // Enter key navigation between fields, last field triggers calculate/back
 function setupEnterNavigation() {
-  const mainFields = ['dailyKm', 'kmPrice', 'tripKm'].map((id) => document.getElementById(id));
+  const mainFields = ['dailyKm', 'kmPrice'].map((id) => document.getElementById(id));
   mainFields.forEach((el, idx) => {
     el.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
