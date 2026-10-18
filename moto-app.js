@@ -8,7 +8,9 @@ let customExpenses = [];
 const TRASH_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>';
 const customItemsEl = document.getElementById('customItems');
 const addCustomBtn = document.getElementById('addCustomBtn');
-const bdCustomRows = document.getElementById('bdCustomRows');
+const extrasBox = document.getElementById('extrasBox');
+const extrasList = document.getElementById('extrasList');
+const extrasTotal = document.getElementById('extrasTotal');
 
 const fuel92PriceInput = document.getElementById('fuel92Price');
 const serviceFeeInput = document.getElementById('serviceFee');
@@ -103,16 +105,12 @@ function calculate() {
   document.getElementById('profitKm').value = profitKm;
 
   const kmPrice = parseFloat(document.getElementById('kmPrice').value) || 0;
-  const tripKm = parseFloat(document.getElementById('tripKm').value) || 0;
   const fuelRate = parseFloat(document.getElementById('fuelRate').value) || 0;
   const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
   const maintenanceRatio = parseFloat(document.getElementById('maintenanceRatio').value) || 0;
   const oilPerKm = parseFloat(document.getElementById('oilPerKm').value) || 0;
   const otherAmount = parseFloat(document.getElementById('otherAmount').value) || 0;
   const companyRatio = parseFloat(document.getElementById('companyRatio').value) || 0;
-
-  // Number of trips, based on profit-basis distance
-  const tripCount = tripKm > 0 ? profitKm / tripKm : 0;
 
   // Total fuel consumed in liters (based on original daily km, unchanged)
   const totalLiters = (fuelRate / 100) * dailyKm;
@@ -128,14 +126,14 @@ function calculate() {
   // Company commission taken from total income
   const companyCommission = dailyIncome * companyRatio;
 
-  // Total daily expenses = fuel + maintenance + oil + other + company commission
+  // Operating expenses = fuel + maintenance + oil + other + company commission
+  const dailyExpenses = fuelCost + maintenanceCost + oilCost + otherCost + companyCommission;
+  // Extra items are shown in their own card but still reduce the net
   const customTotal = customExpenses.reduce((sum, it) => sum + (parseFloat(it.amount) || 0), 0);
-  const dailyExpenses = fuelCost + maintenanceCost + oilCost + otherCost + companyCommission + customTotal;
 
-  // Net expected profit
-  const dailyNetProfit = dailyIncome - dailyExpenses;
+  // Net expected income
+  const dailyNetProfit = dailyIncome - dailyExpenses - customTotal;
 
-  document.getElementById('tripCount').textContent = round2(tripCount).toLocaleString('en-US');
   document.getElementById('dailyIncome').textContent = round2(dailyIncome).toLocaleString('en-US');
   document.getElementById('dailyExpenses').textContent = round2(dailyExpenses).toLocaleString('en-US');
   document.getElementById('dailyNetProfit').textContent = round2(dailyNetProfit).toLocaleString('en-US');
@@ -308,9 +306,12 @@ function renderCustomItems() {
 }
 
 function renderCustomBreakdown() {
-  bdCustomRows.innerHTML = '';
+  extrasList.innerHTML = '';
+  let total = 0;
+  let shown = 0;
   customExpenses.forEach((item) => {
     const amt = parseFloat(item.amount) || 0;
+    total += amt;
     if (!item.label && amt === 0) return;
     const row = document.createElement('div');
     row.className = 'breakdown-row';
@@ -320,8 +321,11 @@ function renderCustomBreakdown() {
     v.textContent = round2(amt).toLocaleString('en-US');
     row.appendChild(l);
     row.appendChild(v);
-    bdCustomRows.appendChild(row);
+    extrasList.appendChild(row);
+    shown++;
   });
+  extrasTotal.textContent = round2(total).toLocaleString('en-US');
+  extrasBox.hidden = shown === 0;
 }
 
 addCustomBtn.addEventListener('click', () => {

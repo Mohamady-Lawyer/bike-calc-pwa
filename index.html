@@ -88,33 +88,43 @@
         </div>
       </div>
 
-      <div class="results">
-        <div class="result-box">
-          <span class="result-label">عدد الرحلات المتوقعة</span>
-          <span class="result-value" id="tripCount">0</span>
-        </div>
+      <div class="results results-flow">
         <div class="result-box">
           <span class="result-label">إجمالي الدخل اليومي</span>
           <span class="result-value" id="dailyIncome">0</span>
         </div>
-        <div class="result-box">
-          <span class="result-label">إجمالي المصاريف اليومية</span>
-          <span class="result-value" id="dailyExpenses">0</span>
-          <div class="breakdown">
-            <div class="breakdown-row"><span>بنزين</span><span id="bdFuel">0</span></div>
-            <div class="breakdown-row"><span>صيانة</span><span id="bdMaintenance">0</span></div>
-            <div class="breakdown-row"><span>زيت موتوسيكلات</span><span id="bdOil">0</span></div>
-            <div class="breakdown-row"><span>مصاريف أخرى</span><span id="bdOther">0</span></div>
-            <div class="breakdown-row"><span>عمولة الشركة</span><span id="bdCompany">0</span></div>
-            <div id="bdCustomRows" style="display:contents;"></div>
+
+        <div class="flow-label">يطرح منه</div>
+
+        <div class="result-pair">
+          <div class="result-box">
+            <span class="result-label">إجمالي المصاريف اليومية</span>
+            <span class="result-value" id="dailyExpenses">0</span>
+            <div class="breakdown">
+              <div class="breakdown-row"><span>بنزين</span><span id="bdFuel">0</span></div>
+              <div class="breakdown-row"><span>صيانة</span><span id="bdMaintenance">0</span></div>
+              <div class="breakdown-row"><span>زيت موتوسيكلات</span><span id="bdOil">0</span></div>
+              <div class="breakdown-row"><span>مصاريف أخرى</span><span id="bdOther">0</span></div>
+              <div class="breakdown-row"><span>عمولة الشركة</span><span id="bdCompany">0</span></div>
+            </div>
+          </div>
+          <div class="result-box extras-box" id="extrasBox" hidden>
+            <div class="extras-head">
+              <span class="result-label">بنود إضافية</span>
+              <span class="result-value" id="extrasTotal">0</span>
+            </div>
+            <div class="breakdown" id="extrasList"></div>
           </div>
         </div>
-        <div class="result-box highlight">
+
+        <div class="flow-label">الناتج</div>
+
+        <div class="result-box highlight net-box">
           <span class="result-label">صافي الدخل المتوقع</span>
           <span class="result-value" id="dailyNetProfit">0</span>
-          <div class="breakdown">
-            <div class="breakdown-row"><span>شهر 26 يوم</span><span id="bdMonth26">0</span></div>
-            <div class="breakdown-row"><span>شهر 30 يوم</span><span id="bdMonth30">0</span></div>
+          <div class="month-row">
+            <div class="month-chip"><span>شهر 26 يوم</span><span id="bdMonth26">0</span></div>
+            <div class="month-chip"><span>شهر 30 يوم</span><span id="bdMonth30">0</span></div>
           </div>
         </div>
       </div>

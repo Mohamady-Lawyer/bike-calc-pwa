@@ -1255,3 +1255,97 @@ body.dark .gate-arrow {
   body.print-all #capitalView { grid-column: 1; grid-row: 2; }
   body.print-all #fixedView { grid-column: 2; grid-row: 2; }
 }
+
+
+/* ===== Results flow: income -> outflows -> net ===== */
+.results.results-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-pair {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.result-pair > .result-box {
+  flex: 1;
+  min-width: 0;
+}
+
+.flow-label {
+  margin: -4px 0;
+  text-align: center;
+  font-size: 11px;
+  color: var(--label-color);
+}
+
+.extras-box {
+  padding: 8px 10px;
+  text-align: right;
+  background: rgba(233, 196, 106, 0.08);
+  border-color: var(--fixed-color);
+}
+
+.extras-box[hidden] {
+  display: none;
+}
+
+.extras-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.extras-head .result-label {
+  margin-bottom: 0;
+  color: var(--fixed-color);
+}
+
+.extras-head .result-value,
+.extras-box .breakdown-row span:last-child {
+  color: var(--fixed-color);
+}
+
+.extras-head .result-value {
+  font-size: 18px;
+  text-shadow: none;
+}
+
+.net-box {
+  padding: 12px;
+}
+
+.net-box .result-value {
+  font-size: 28px;
+}
+
+.month-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--divider-color);
+}
+
+.month-chip {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--divider-color);
+  border-radius: 8px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: var(--label-color);
+}
+
+.month-chip span:last-child {
+  font-weight: 600;
+  color: var(--accent-1);
+}
