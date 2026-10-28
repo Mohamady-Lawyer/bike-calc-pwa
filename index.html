@@ -155,8 +155,8 @@
           <input type="number" id="oilPerKm" value="0.49" step="0.01">
         </div>
         <div class="row">
-          <label>مصاريف أخرى</label>
-          <input type="number" id="otherAmount" value="50" step="0.01">
+          <label>مصاريف أخرى (جنيه/كم)</label>
+          <input type="number" id="otherAmount" value="0.5" step="0.01">
         </div>
         <div class="row">
           <label>نسبة عمولة الشركة (من إجمالي الدخل)</label>
@@ -167,12 +167,37 @@
         <button id="addCustomBtn" type="button" class="custom-add-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg><span>إضافة بند</span></button>
       </div>
 
-      <div class="card no-print" style="margin-top:12px;">
+      <div class="card no-print xfer" style="margin-top:12px;">
         <h2>نقل البيانات بين الأجهزة</h2>
-        <button id="exportBtn" class="calc-btn back-btn" style="margin-bottom:8px;">نسخ كود البيانات</button>
-        <textarea id="importText" placeholder="الصق كود البيانات هنا..." style="width:100%; min-height:60px; padding:8px; border-radius:8px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--input-text); font-family:'JetBrains Mono',monospace; font-size:11px; direction:ltr; margin-bottom:8px; resize:vertical;"></textarea>
-        <button id="importBtn" class="calc-btn">استيراد البيانات</button>
-        <div id="exportImportStatus" style="text-align:center; font-size:11px; color:var(--label-color); margin-top:6px;"></div>
+
+        <div class="xfer-head"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 9l5 -5l5 5"/><path d="M12 4l0 12"/></svg><span>تصدير</span></div>
+        <p class="xfer-note">الكود ده بيشمل كل بيانات حاسبة الموتوسيكل. انسخه أو اعرضه كـ QR وافتحه على جهاز تاني.</p>
+        <input id="exportPreview" class="xfer-prev" type="text" readonly dir="ltr" aria-label="معاينة الكود">
+        <p id="exportCount" class="xfer-note"></p>
+        <div class="xfer-btns">
+          <button id="exportBtn" type="button" class="xfer-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2"/></svg><span>نسخ الكود</span></button>
+          <button id="qrBtn" type="button" class="xfer-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M4 15a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M7 7l0 .01M17 7l0 .01M7 17l0 .01M14 14l3 0M20 14l0 .01M14 14l0 3M14 20l3 0M17 17l3 0M20 17l0 3"/></svg><span>عرض QR</span></button>
+        </div>
+        <div id="qrBox" hidden><canvas id="qrCv"></canvas><p id="qrMsg" class="xfer-note"></p></div>
+
+        <div class="xfer-sep" role="separator"></div>
+
+        <div class="xfer-head"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/></svg><span>استيراد</span></div>
+        <p class="xfer-note">الصق الكود هنا. الاستيراد بيستبدل كل البيانات الحالية.</p>
+        <div class="xfer-impwrap">
+          <textarea id="importText" class="xfer-in" rows="2" dir="ltr" placeholder="MOTOCALC...:" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="استيراد الكود"></textarea>
+          <button id="importClearBtn" type="button" class="xfer-x" aria-label="مسح الخانة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></svg></button>
+        </div>
+        <p id="importCount" class="xfer-note"></p>
+        <div class="xfer-btns">
+          <button id="importBtn" type="button" class="xfer-btn primary"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5l10 -10"/></svg><span>استيراد</span></button>
+          <button id="scanBtn" type="button" class="xfer-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M14 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M4 15a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z"/><path d="M7 7l0 .01M17 7l0 .01M7 17l0 .01M14 14l3 0M20 14l0 .01M14 14l0 3M14 20l3 0M17 17l3 0M20 17l0 3"/></svg><span>مسح QR</span></button>
+        </div>
+        <div class="xfer-btns" style="margin-top:8px;">
+          <button id="fileBtn" type="button" class="xfer-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 9l5 -5l5 5"/><path d="M12 4l0 12"/></svg><span>استيراد من ملف (نص أو صورة QR)</span></button>
+        </div>
+        <input type="file" id="importFile" class="xfer-file" accept=".txt,text/plain,image/*" tabindex="-1" aria-hidden="true">
+        <div id="exportImportStatus" class="xfer-status"></div>
       </div>
 
       <button id="backBtn" class="calc-btn back-btn no-print">رجوع للحاسبة</button>
@@ -278,6 +303,8 @@
       </div>
     </div>
   </div>
+
+  <div id="scanner" class="no-print" hidden><div class="scbox"><video id="scVideo" playsinline muted></video><p>وجّه الكاميرا ناحية الـ QR</p><button id="scClose" type="button" class="xfer-btn">إغلاق</button></div></div>
 
   <script src="storage-shim.js"></script>
   <script src="moto-app.js"></script>

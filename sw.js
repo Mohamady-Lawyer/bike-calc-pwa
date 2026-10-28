@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calc-app-v19';
+const CACHE_NAME = 'calc-app-v20';
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -7,6 +7,8 @@ const FILES_TO_CACHE = [
   './moto-app.js',
   './interest-app.js',
   './app-tabs.js',
+  './qrcode.js',
+  './jsqr.js',
   './manifest.json',
   './icons/icon16.png',
   './icons/icon48.png',

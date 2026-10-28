@@ -30,6 +30,7 @@ const tabCapital = document.getElementById('tabCapital');
 const tabFixed = document.getElementById('tabFixed');
 
 function showSettings() {
+  if (typeof refreshExportPreview === 'function') refreshExportPreview();
   mainView.style.display = 'none';
   settingsView.style.display = 'block';
   pageTitle.textContent = 'الإعدادات';
@@ -38,6 +39,8 @@ function showSettings() {
 }
 
 function showMain() {
+  if (typeof stopScan === 'function') stopScan();
+  if (typeof hideQrBox === 'function') hideQrBox();
   settingsView.style.display = 'none';
   capitalView.style.display = 'none';
   fixedView.style.display = 'none';
@@ -49,6 +52,8 @@ function showMain() {
 }
 
 function showTab(tab) {
+  if (typeof stopScan === 'function') stopScan();
+  if (typeof hideQrBox === 'function') hideQrBox();
   tabCalc.classList.remove('active');
   tabCapital.classList.remove('active');
   tabFixed.classList.remove('active');
@@ -119,7 +124,8 @@ function calculate() {
   // Maintenance, oil & other expenses derived from fuel cost
   const maintenanceCost = fuelCost * maintenanceRatio;
   const oilCost = oilPerKm * dailyKm;
-  const otherCost = otherAmount;
+  // Other expenses are now EGP per km x distance covered (like oil)
+  const otherCost = otherAmount * dailyKm;
 
   // Total daily income, based on profit-basis distance
   const dailyIncome = profitKm * kmPrice;
@@ -208,7 +214,7 @@ darkModeBtn.addEventListener('click', () => {
   if (typeof syncInterestDarkIcon === 'function') syncInterestDarkIcon(isDark);
 });
 
-chrome.storage.local.get(['darkMode', 'inputs', 'customExpenses'], (data) => {
+chrome.storage.local.get(['darkMode', 'inputs', 'customExpenses', 'otherPerKm'], (data) => {
   applyDarkMode(data.darkMode !== false); // default dark
   if (Array.isArray(data.customExpenses)) customExpenses = sanitizeCustom(data.customExpenses);
   renderCustomItems();
@@ -218,6 +224,13 @@ chrome.storage.local.get(['darkMode', 'inputs', 'customExpenses'], (data) => {
         document.getElementById(id).value = data.inputs[id];
       }
     });
+  }
+  // One-time migration: "other expenses" used to be a fixed daily amount (e.g. 50);
+  // it is now EGP per km, so reset it to the new default (0.5) once.
+  if (!data.otherPerKm) {
+    document.getElementById('otherAmount').value = '0.5';
+    saveInputs();
+    chrome.storage.local.set({ otherPerKm: true });
   }
   calculate();
 });
@@ -520,95 +533,427 @@ function initSplitColumns() {
 
 initSplitColumns();
 
-// ===== Export / Import ALL Moto tab data as a text code =====
+// ===== Export / Import ALL Moto data: text code + QR (same idea as the work calculator) =====
+const exportPreview = document.getElementById('exportPreview');
+const exportCount = document.getElementById('exportCount');
 const exportBtn = document.getElementById('exportBtn');
+const qrBtn = document.getElementById('qrBtn');
+const qrBox = document.getElementById('qrBox');
+const qrCv = document.getElementById('qrCv');
+const qrMsg = document.getElementById('qrMsg');
 const importBtn = document.getElementById('importBtn');
 const importText = document.getElementById('importText');
+const importCount = document.getElementById('importCount');
+const importClearBtn = document.getElementById('importClearBtn');
+const scanBtn = document.getElementById('scanBtn');
+const fileBtn = document.getElementById('fileBtn');
+const importFile = document.getElementById('importFile');
+const scannerEl = document.getElementById('scanner');
+const scVideo = document.getElementById('scVideo');
+const scClose = document.getElementById('scClose');
 const exportImportStatus = document.getElementById('exportImportStatus');
+let statusTimer = null;
 
 function showExportImportStatus(msg, isError) {
   exportImportStatus.textContent = msg;
   exportImportStatus.style.color = isError ? 'var(--danger)' : 'var(--success-text)';
-  setTimeout(() => { exportImportStatus.textContent = ''; }, 3500);
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => { exportImportStatus.textContent = ''; }, 4500);
 }
 
-exportBtn.addEventListener('click', () => {
+// --- helpers: base64 / deflate ---
+function b64e(bytes) {
+  let bin = '';
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function b64d(t) {
+  const bin = atob(t);
+  const b = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+  return b;
+}
+function pipeStream(stream, data) {
+  const w = stream.writable.getWriter();
+  w.write(data).catch(() => {});
+  w.close().catch(() => {});
+  return new Response(stream.readable).arrayBuffer().then((x) => new Uint8Array(x));
+}
+function loadLib(src, isReady) {
+  return new Promise((resolve, reject) => {
+    if (isReady()) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('load failed'));
+    document.head.appendChild(s);
+  });
+}
+const loadQrGen = () => loadLib('qrcode.js', () => typeof window.qrcode === 'function');
+const loadQrRead = () => loadLib('jsqr.js', () => typeof window.jsQR === 'function');
+
+// --- build / encode / decode the data code ---
+function buildPayload() {
   const inputsValues = {};
   inputIds.forEach((id) => {
     inputsValues[id] = document.getElementById(id).value;
   });
-
-  const payload = {
+  return {
     inputs: inputsValues,
+    otherPerKm: true,
     darkMode: document.body.classList.contains('dark'),
     capitalItems,
     expenseItems,
     fixedItems,
     customExpenses
   };
-  const code = 'MOTOCALC2:' + btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+}
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(code)
-      .then(() => showExportImportStatus('تم نسخ الكود! الصقه في الجهاز التاني'))
-      .catch(() => {
-        importText.value = code;
-        showExportImportStatus('انسخ الكود يدويًا من الصندوق تحت');
-      });
-  } else {
-    importText.value = code;
-    showExportImportStatus('انسخ الكود يدويًا من الصندوق تحت');
+// MOTOCALC2: = plain base64 (old format), MOTOCALC3: = deflate-compressed (shorter, better for QR)
+function encodeCode(obj) {
+  const json = JSON.stringify(obj);
+  const plain = 'MOTOCALC2:' + btoa(unescape(encodeURIComponent(json)));
+  if (typeof CompressionStream === 'undefined') return Promise.resolve(plain);
+  const raw = new TextEncoder().encode(json);
+  return pipeStream(new CompressionStream('deflate'), raw).then((z) => {
+    const packed = 'MOTOCALC3:' + b64e(z);
+    return packed.length < plain.length ? packed : plain;
+  }, () => plain);
+}
+
+function decodeCode(raw) {
+  const kind = raw.slice(0, 10);
+  const body = raw.slice(10);
+  if (kind === 'MOTOCALC2:') {
+    return Promise.resolve(JSON.parse(decodeURIComponent(escape(atob(body)))));
   }
+  if (kind === 'MOTOCALC3:' && typeof DecompressionStream !== 'undefined') {
+    return pipeStream(new DecompressionStream('deflate'), b64d(body))
+      .then((u) => JSON.parse(new TextDecoder().decode(u)));
+  }
+  return Promise.reject(new Error('bad code'));
+}
+
+// Pull a code out of pasted text (e.g. a WhatsApp message with extra words around it)
+function extractCode(text) {
+  const t = String(text || '');
+  const m = /MOTOCALC[23]:/.exec(t);
+  if (!m) return null;
+  const lines = t.slice(m.index).split(/\r?\n/);
+  let out = '';
+  let first = true;
+  for (let i = 0; i < lines.length; i++) {
+    let ln = lines[i].trim();
+    if (first) { ln = ln.split(/\s+/)[0]; first = false; }
+    else if (!/^[A-Za-z0-9+\/=]+$/.test(ln)) break;
+    if (!ln) break;
+    out += ln;
+    if (/=$/.test(ln)) break;
+  }
+  return /^MOTOCALC[23]:[A-Za-z0-9+\/=]+$/.test(out) ? out : null;
+}
+
+function previewOf(c) {
+  return c.length <= 28 ? c : c.slice(0, 14) + '......' + c.slice(-8);
+}
+function countText(c) {
+  return 'عدد الحروف: ' + c.length.toLocaleString('en-US') + ' حرف';
+}
+
+let lastCode = '';
+function refreshCode() {
+  return encodeCode(buildPayload()).then((code) => {
+    lastCode = code;
+    exportPreview.value = previewOf(code);
+    exportCount.textContent = countText(code);
+    return code;
+  });
+}
+function refreshExportPreview() { refreshCode(); }
+
+// keep the preview fresh while settings are edited
+let previewTimer = null;
+settingsView.addEventListener('input', (e) => {
+  if (e.target === importText) return;
+  clearTimeout(previewTimer);
+  previewTimer = setTimeout(refreshCode, 400);
 });
 
-importBtn.addEventListener('click', () => {
-  const raw = importText.value.trim();
-  if (!raw.startsWith('MOTOCALC2:')) {
+// --- export: copy ---
+exportBtn.addEventListener('click', () => {
+  refreshCode().then((code) => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code)
+        .then(() => showExportImportStatus('تم نسخ الكود! الصقه في الجهاز التاني'))
+        .catch(() => {
+          importText.value = code;
+          updateImportCount();
+          showExportImportStatus('انسخ الكود يدويًا من الصندوق تحت');
+        });
+    } else {
+      importText.value = code;
+      updateImportCount();
+      showExportImportStatus('انسخ الكود يدويًا من الصندوق تحت');
+    }
+  });
+});
+
+// --- export: QR ---
+function hideQrBox() { qrBox.hidden = true; }
+
+qrBtn.addEventListener('click', () => {
+  if (!qrBox.hidden) { hideQrBox(); return; }
+  Promise.all([refreshCode(), loadQrGen()]).then((r) => {
+    const code = r[0];
+    qrBox.hidden = false;
+    try {
+      const q = window.qrcode(0, 'L');
+      q.addData(code);
+      q.make();
+      const n = q.getModuleCount();
+      const cell = Math.max(3, Math.floor(900 / (n + 8)));
+      const sz = (n + 8) * cell;
+      qrCv.width = sz;
+      qrCv.height = sz;
+      const g = qrCv.getContext('2d');
+      g.fillStyle = '#fff';
+      g.fillRect(0, 0, sz, sz);
+      g.fillStyle = '#000';
+      for (let row = 0; row < n; row++) {
+        for (let col = 0; col < n; col++) {
+          if (q.isDark(row, col)) g.fillRect((col + 4) * cell, (row + 4) * cell, cell, cell);
+        }
+      }
+      qrCv.hidden = false;
+      qrMsg.textContent = 'اقرأه من جهاز تاني بزر "مسح QR"، أو صوّره وارفعه بزر "استيراد من ملف".';
+    } catch (e) {
+      qrCv.hidden = true;
+      qrMsg.textContent = 'البيانات أكبر من إن QR واحد يشيلها. استخدم زر نسخ الكود.';
+    }
+  }).catch(() => {
+    showExportImportStatus('تعذّر تحميل مكتبة الـ QR (محتاجة إنترنت أول مرة)', true);
+  });
+});
+
+// --- import: apply a decoded payload ---
+function applyPayload(payload) {
+  if (!payload || !payload.inputs || !Array.isArray(payload.capitalItems) || !Array.isArray(payload.expenseItems)) {
+    throw new Error('invalid shape');
+  }
+
+  // Apply calculator inputs & settings
+  inputIds.forEach((id) => {
+    if (payload.inputs[id] !== undefined) {
+      document.getElementById(id).value = payload.inputs[id];
+    }
+  });
+  // Old codes stored "other expenses" as a fixed daily amount: use the new per-km default instead
+  if (payload.otherPerKm !== true) {
+    document.getElementById('otherAmount').value = '0.5';
+  }
+  saveInputs();
+
+  // Apply extra daily expense items (absent in older codes: keep current)
+  if (Array.isArray(payload.customExpenses)) {
+    customExpenses = sanitizeCustom(payload.customExpenses);
+    renderCustomItems();
+    saveCustomExpenses();
+  }
+
+  // Apply dark mode
+  applyDarkMode(!!payload.darkMode);
+  chrome.storage.local.set({ darkMode: !!payload.darkMode });
+  if (typeof syncInterestDarkIcon === 'function') syncInterestDarkIcon(!!payload.darkMode);
+
+  // Apply capital / expenses / fixed
+  capitalItems = payload.capitalItems;
+  expenseItems = payload.expenseItems;
+  fixedItems = Array.isArray(payload.fixedItems) && payload.fixedItems.length ? payload.fixedItems : [{ amount: '', label: '' }];
+  renderSplitColumn(capitalItems, capitalItemsEl, capitalBtnRow, 'capital');
+  renderSplitColumn(expenseItems, expenseItemsEl, expenseBtnRow, 'expense');
+  renderSplitColumn(fixedItems, fixedItemsEl, fixedBtnRow, 'fixed');
+  updateSplitTotals();
+  updateFixedTotal();
+  saveAllSplitData();
+
+  calculate();
+  refreshCode();
+}
+
+function doImport(askFirst) {
+  const raw = extractCode(importText.value) || importText.value.replace(/\s+/g, '');
+  if (!/^MOTOCALC[23]:/.test(raw)) {
     showExportImportStatus('الكود غير صحيح أو غير مكتمل', true);
     return;
   }
-  try {
-    const json = decodeURIComponent(escape(atob(raw.slice('MOTOCALC2:'.length))));
-    const payload = JSON.parse(json);
-    if (!payload.inputs || !Array.isArray(payload.capitalItems) || !Array.isArray(payload.expenseItems)) {
-      throw new Error('invalid shape');
-    }
-
-    // Apply calculator inputs & settings
-    inputIds.forEach((id) => {
-      if (payload.inputs[id] !== undefined) {
-        document.getElementById(id).value = payload.inputs[id];
-      }
-    });
-    saveInputs();
-
-    // Apply extra daily expense items (absent in older codes: keep current)
-    if (Array.isArray(payload.customExpenses)) {
-      customExpenses = sanitizeCustom(payload.customExpenses);
-      renderCustomItems();
-      saveCustomExpenses();
-    }
-
-    // Apply dark mode
-    applyDarkMode(!!payload.darkMode);
-    chrome.storage.local.set({ darkMode: !!payload.darkMode });
-    if (typeof syncInterestDarkIcon === 'function') syncInterestDarkIcon(!!payload.darkMode);
-
-    // Apply capital / expenses / fixed
-    capitalItems = payload.capitalItems;
-    expenseItems = payload.expenseItems;
-    fixedItems = Array.isArray(payload.fixedItems) && payload.fixedItems.length ? payload.fixedItems : [{ amount: '', label: '' }];
-    renderSplitColumn(capitalItems, capitalItemsEl, capitalBtnRow, 'capital');
-    renderSplitColumn(expenseItems, expenseItemsEl, expenseBtnRow, 'expense');
-    renderSplitColumn(fixedItems, fixedItemsEl, fixedBtnRow, 'fixed');
-    updateSplitTotals();
-    updateFixedTotal();
-    saveAllSplitData();
-
-    calculate();
+  decodeCode(raw).then((payload) => {
+    if (askFirst && !confirm('هيتم استبدال كل بيانات حاسبة الموتوسيكل الحالية. تكمل؟')) return;
+    applyPayload(payload);
     importText.value = '';
+    updateImportCount();
     showExportImportStatus('تم استيراد كل بيانات الموتوسيكل بنجاح');
-  } catch (e) {
+  }).catch(() => {
     showExportImportStatus('تعذّر قراءة الكود، تأكد إنه منسوخ كامل', true);
+  });
+}
+
+function updateImportCount() {
+  const v = importText.value.trim();
+  importCount.textContent = v ? countText(v) : '';
+}
+
+importBtn.addEventListener('click', () => doImport(false));
+importText.addEventListener('input', updateImportCount);
+importText.addEventListener('paste', (e) => {
+  const cd = e.clipboardData || window.clipboardData;
+  const t = cd ? cd.getData('text') : '';
+  const code = extractCode(t);
+  if (code) {
+    e.preventDefault();
+    importText.value = code;
+    updateImportCount();
   }
+});
+importClearBtn.addEventListener('click', () => {
+  importText.value = '';
+  updateImportCount();
+});
+
+// --- import: from a file (text file or QR image) ---
+function qrFromImage(file, done) {
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    loadQrRead().then(() => {
+      try {
+        const sc = Math.min(1, 2200 / Math.max(img.naturalWidth, img.naturalHeight));
+        const cv = document.createElement('canvas');
+        cv.width = Math.round(img.naturalWidth * sc);
+        cv.height = Math.round(img.naturalHeight * sc);
+        const cx = cv.getContext('2d', { willReadFrequently: true });
+        cx.drawImage(img, 0, 0, cv.width, cv.height);
+        const id = cx.getImageData(0, 0, cv.width, cv.height);
+        const r = window.jsQR(id.data, cv.width, cv.height, { inversionAttempts: 'attemptBoth' });
+        done(r ? r.data : null);
+      } catch (e) { done(null); }
+      URL.revokeObjectURL(url);
+    }, () => { URL.revokeObjectURL(url); done(null); });
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); done(null); };
+  img.src = url;
+}
+
+function readTextFile(file, done) {
+  if (file.text) { file.text().then(done, () => done(null)); return; }
+  const fr = new FileReader();
+  fr.onload = () => done(String(fr.result));
+  fr.onerror = () => done(null);
+  fr.readAsText(file);
+}
+
+fileBtn.addEventListener('click', () => {
+  importFile.value = '';
+  importFile.click();
+});
+
+importFile.addEventListener('change', () => {
+  const f = importFile.files && importFile.files[0];
+  importFile.value = '';
+  if (!f) return;
+  if (f.size > 8 * 1024 * 1024) { showExportImportStatus('الملف كبير زيادة', true); return; }
+  const isImg = /^image\//.test(f.type) || /\.(png|jpe?g|webp|bmp|gif)$/i.test(f.name);
+  const got = (t) => {
+    const code = t ? extractCode(t) : null;
+    if (!code) {
+      showExportImportStatus(isImg ? 'ما لقيتش QR واضح في الصورة' : 'ما لقيتش كود في الملف', true);
+      return;
+    }
+    importText.value = code;
+    updateImportCount();
+    showExportImportStatus('تم تحميل الكود. اضغط استيراد');
+  };
+  if (isImg) qrFromImage(f, got); else readTextFile(f, got);
+});
+
+// --- import: scan QR with the camera ---
+const scan = { stream: null, timer: null };
+
+function stopScan() {
+  clearInterval(scan.timer);
+  scan.timer = null;
+  if (scan.stream) {
+    scan.stream.getTracks().forEach((t) => t.stop());
+    scan.stream = null;
+  }
+  scVideo.srcObject = null;
+  scannerEl.hidden = true;
+}
+
+function onScanned(text) {
+  const code = extractCode(text);
+  if (!code) {
+    showExportImportStatus('الـ QR ده مش من حاسبة الموتوسيكل', true);
+    return;
+  }
+  importText.value = code;
+  updateImportCount();
+  doImport(true);
+}
+
+function startScan() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showExportImportStatus('الكاميرا مش متاحة في المتصفح ده. استخدم "استيراد من ملف"', true);
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+    audio: false
+  }).then((st) => {
+    scan.stream = st;
+    scannerEl.hidden = false;
+    scVideo.srcObject = st;
+    const pl = scVideo.play();
+    if (pl && pl.catch) pl.catch(() => {});
+
+    let det = null;
+    if ('BarcodeDetector' in window) {
+      try { det = new BarcodeDetector({ formats: ['qr_code'] }); } catch (e) { det = null; }
+    }
+    loadQrRead().catch(() => {}); // fallback decoder, loaded in the background
+
+    const cv = document.createElement('canvas');
+    const ctx = cv.getContext('2d', { willReadFrequently: true });
+    let busy = false;
+    scan.timer = setInterval(() => {
+      const v = scVideo;
+      if (busy || v.readyState < 2 || !v.videoWidth) return;
+      busy = true;
+      const done = (t) => {
+        busy = false;
+        if (t) { stopScan(); onScanned(t); }
+      };
+      const viaJs = () => {
+        if (typeof window.jsQR !== 'function') return null;
+        cv.width = v.videoWidth;
+        cv.height = v.videoHeight;
+        ctx.drawImage(v, 0, 0, cv.width, cv.height);
+        const id = ctx.getImageData(0, 0, cv.width, cv.height);
+        const c = window.jsQR(id.data, cv.width, cv.height, { inversionAttempts: 'dontInvert' });
+        return c ? c.data : null;
+      };
+      if (det) {
+        det.detect(v).then((r) => done(r && r.length ? r[0].rawValue : null), () => { det = null; done(null); });
+      } else {
+        try { done(viaJs()); } catch (e) { done(null); }
+      }
+    }, 300);
+  }, () => {
+    showExportImportStatus('الكاميرا مش متاحة. اسمح بالوصول للكاميرا أو استخدم "استيراد من ملف"', true);
+  });
+}
+
+scanBtn.addEventListener('click', startScan);
+scClose.addEventListener('click', stopScan);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && !scannerEl.hidden) stopScan();
 });

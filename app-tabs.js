@@ -8,6 +8,7 @@ function showApp(appName) {
   interestApp.classList.toggle('active', appName === 'interest');
   window.scrollTo(0, 0);
   closePrintMenu();
+  if (typeof stopScan === 'function') stopScan();
 }
 
 document.getElementById('gateMotoBtn').addEventListener('click', () => showApp('moto'));
